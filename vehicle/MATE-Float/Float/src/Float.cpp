@@ -124,7 +124,6 @@ bool Float::limitFull(){
 
 // *** Motion Control  *** //
 
-
 // Empty ballast
 void Float::empty(int speed){
   digitalWrite(enablePin, HIGH);

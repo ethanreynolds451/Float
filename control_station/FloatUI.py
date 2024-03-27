@@ -364,6 +364,11 @@ class Layout:
     getDataWidth = 15
     getDataHeight = 1
 
+    resetButtonRow = 1
+    resetButtonColumn = directorySelectColumn
+    resetButtonRowSpan = getDataRowSpan
+    resetButtonColumnSpan = directorySelectColumnSpan
+
 # Fonts
 class Fonts:
     headerFontSize = 32
@@ -481,6 +486,10 @@ getData = tk.Button(controlPanel, width=Layout.getDataWidth, height=Layout.getDa
                     anchor='center', justify='center', command=lambda: get_data())
 getData.grid(row=Layout.getDataRow, column=Layout.getDataColumn, rowspan=Layout.getDataRowSpan,
              columnspan=Layout.getDataColumnSpan, **paddings, sticky="ew")
+
+resetButton = tk.Button(controlPanel, text="Reset", anchor='center', justify='center', command=lambda: sendCommand(Command.reset))
+resetButton.grid(row=Layout.resetButtonRow, column=Layout.resetButtonColumn, rowspan=1,
+                     columnspan=Layout.resetButtonColumnSpan, **paddings, sticky="ew")
 
 controlPanel.grid_rowconfigure(0, weight=1)
 controlPanel.grid_columnconfigure(0, weight=1)

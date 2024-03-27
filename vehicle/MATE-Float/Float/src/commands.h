@@ -54,7 +54,7 @@ class commands {
         motion = 1; 
       }
       if(code == 4){
-        goToCenter();
+        goToCenter = true;
       }
       if(code == 5){
         sendTime();
@@ -89,14 +89,14 @@ class commands {
         verticalProfile = true;
       }
       if(code == 14){
+        fillEmpty = true;
       }
       if(code == 20){
         getSampleData();
       }
     }
 
-    void goToCenter(){
-    }
+
     void sendTime(){
       clear(dataString, dataLength);
       timeToString(dataString, RTC.getHours(), RTC.getMinutes(), RTC.getSeconds());
