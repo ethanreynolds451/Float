@@ -35,7 +35,7 @@ from tkinter import ttk
 from tkinter import messagebox
 
 # Commands
-class command:
+class Command:
     # Local
     transmisson_request = "RQTRANSMISSION="
     data_header = "DATA:"
@@ -487,7 +487,7 @@ getData = tk.Button(controlPanel, width=Layout.getDataWidth, height=Layout.getDa
 getData.grid(row=Layout.getDataRow, column=Layout.getDataColumn, rowspan=Layout.getDataRowSpan,
              columnspan=Layout.getDataColumnSpan, **paddings, sticky="ew")
 
-resetButton = tk.Button(controlPanel, text="Reset", anchor='center', justify='center', command=lambda: sendCommand(Command.reset))
+resetButton = tk.Button(controlPanel, text="Reset", anchor='center', justify='center', command=lambda: send(Command.reset))
 resetButton.grid(row=Layout.resetButtonRow, column=Layout.resetButtonColumn, rowspan=1,
                      columnspan=Layout.resetButtonColumnSpan, **paddings, sticky="ew")
 

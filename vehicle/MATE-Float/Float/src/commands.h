@@ -89,7 +89,9 @@ class commands {
         verticalProfile = true;
       }
       if(code == 14){
-        fillEmpty = true;
+        filled = false;     // Start out assuming it is not full
+        emptied = false;
+        fillEmpty = true;    // Execute fill - empty sequence
       }
       if(code == 20){
         getSampleData();

@@ -70,6 +70,15 @@ void Float::update(){
     }
   }
   //checkInputs();
+  if(fillEmpty){
+    if(! filled){           // If it has not yet filled
+        motion = 0;         // Fill until limit is reached
+    } else if(! emptied) {  // Once it has filled
+        motion = 2;         // Empty until the limit is reached
+    } else {                // Once it has filled and emptied
+        fillEmpty = false;  // Break sequence
+    }
+  }
   if(motion == 1){
     stop();
   } else if(motion == 0){
@@ -213,12 +222,14 @@ bool Float::checkLimits(){
   // If it is going down and hits the lower limit, stop
   if((digitalRead(limitEmptyPin) == 0)&&(motion == 2)){
     stop();
+    emptied = true;
     motion = 1;
     return true;
   }
   // If it is going up and hits the upper limit, stop
   if((digitalRead(limitFullPin) == 0)&&(motion == 0)){
     stop();
+    filled = true;
     motion = 1;
     return true;
   }

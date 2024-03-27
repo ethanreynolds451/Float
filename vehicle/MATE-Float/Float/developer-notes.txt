@@ -1,0 +1,3 @@
+Each function is responsible for initializing flags as required when it is called.
+Function will not reset the flags after they have terminated.
+No infinite loops!
