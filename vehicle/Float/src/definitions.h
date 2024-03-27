@@ -1,7 +1,6 @@
 #ifndef DEFINITIONS_h
 #define DEFINITIONS_h
 
-
 void(* resetFunc) (void) = 0;
 
 // Includes

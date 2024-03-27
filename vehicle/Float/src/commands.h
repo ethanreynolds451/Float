@@ -19,18 +19,26 @@ class commands {
       {1, "CMEMTY", 0},
       {2, "CMFILL", 0},
       {3, "CMSTOP", 0},
-      {4, "GTTIME", 0},
-      {5, "GTPRSS", 0},
-      {6, "GTDTCT", 0},
-      {7, "GTDATA", 0},
+      {4, "CMCNTR", 0},     // Just added, need to link
+      {5, "GTTIME", 0},
+      {6, "GTPRSS", 0},
+      {7, "GTDTCT", 0},
+      {8, "GTDATA", 0},
       {10, "CONFRM", 0},
       {11, "GTRESP", 0},
       {12, "BRDCST", 0},
       {13, "CMVPRO", 0},
+      {14, "CMUPDN", 0},    // Just added, need to link
       {20, "GTSDTA", 0}
     };
 
     void execute(byte code){
+      // convert code to command, NOT YET ACTIVE
+      char activeCommandCode[8] = "";
+      for(int i = 0; i < commandLen; i++){  // For number of potential commands
+        if(code = command[i].index){  // If numbers match
+            strcpy(activeCommandCode, command[i].code);   // Set active command to current index
+            break;
       if(code == 0){
         resetFunc();
       }
@@ -44,17 +52,20 @@ class commands {
         motion = 1; 
       }
       if(code == 4){
-        sendTime();
+        goToCenter();
       }
       if(code == 5){
+        sendTime();
+      }
+      if(code == 6){
         sendPressure();
       } 
-      if(code == 6){
+      if(code == 7){
         clear(dataString, dataLength);
         itoa(dataCount, dataString, 10);
         radio.send(dataString);
       }
-      if(code == 7){
+      if(code == 8){
         if(dataCount > 0){
           transmitData();
         } else {
@@ -75,19 +86,14 @@ class commands {
         reachedBottom = false;
         verticalProfile = true;
       }
+      if(code == 14){
+      }
       if(code == 20){
         getSampleData();
       }
     }
 
-    void empty(){
-      motion = 2;
-    }
-    void fill(){
-      motion = 0;
-    }
-    void stop(){
-      motion = 1;
+    void goToCenter(){
     }
     void sendTime(){
       clear(dataString, dataLength);
