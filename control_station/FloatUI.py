@@ -36,15 +36,33 @@ from tkinter import messagebox
 
 # Commands
 class command:
+    # Local
     transmisson_request = "RQTRANSMISSION="
     data_header = "DATA:"
+    # Basic Control
+    confirm = "CONFRM"
+    response = "GTRESP"
+    broadcast = "BRDCST"
+    reset = "RESET"
+    empty = "CMEMTY"
+    fill = "CMFILL"
+    stop = "CMSTOP"
+    # Sensor Retrieval
+    get_time = "GTTIME"
+    get_pressure = "GTPRSS"
+    # Data Transmission
+    get_data_count = "GTDTCT"
+    get_data = "GTDATA"
+    get_sample_data = "GTSDTA"
+    # Compound functions
+    vertical_profile = "CMVPRO"
+    down_up = "CMDNUP"
+    center = "CMCNTR"
 
+# Main Window Setup
 defaultMainWindowSize = '800x600'
-
 root = tk.Tk()
-
 root.title("MATE Float")
-
 root.geometry(defaultMainWindowSize)
 
 #Serial Setup Variabes
@@ -72,6 +90,7 @@ active_message = ""
 directory =  tk.StringVar(root)
 directory.set(Path.home() / "Desktop")
 
+# <editor-fold desc="Core Functions">
 def console_print(message):
     console['state'] = 'normal'
     console.insert(tk.END, message)
@@ -236,27 +255,36 @@ def get_data():
             console_println("Reading data from float...")
         except:
             console_println("Error creating file\nCheck folder permissions")
-            
+
+
 ##        #Open the file and add a header
 ##        with open(file, 'w') as file:
 ##            try:
-##                 
 ##
 ##
-##            
+##
+##
 ##            try:
 ##                data_length = int(active_message[str.find(command.transmisson_request)+len(command.transmisson_request)+1:])
 ##                while(data_length > 0):
 ##                    if data_header in active_message:
-##                        
+##
 ##                console_println("Float data read sucessfully")
 ##                Float.write("GTDATA".encode())
 ##            except:
 ##                console_println("Failed to read data")
 ##    else:
 ##        console_println("No data to read")
-        
-#Grid
+
+# Grid
+
+# UI Layout definitions
+# Grid Layout Parameters
+
+# </editor-fold>
+
+# <editor-fold desc="UI Layout">
+# Tkinter widget layout
 class Layout:
     maxWidth = 8
     maxHeight = 6
@@ -366,7 +394,9 @@ class Colors:
     serialMonitorColor = create_colored_frame(root, Layout.serialMonitorRow, consoleRowColor)
 
 paddings = {'padx': 5, 'pady': 5}
+# </editor-fold>
 
+# <editor-fold desc="Tkinter Widgets">
 # Header
 headerLabel = tk.Label(root, text="Sound School Ocean Engineering", fg=Fonts.headerFontColor, font=(Fonts.headerFontStyle, Fonts.headerFontSize), justify='center', bg=Colors.headerRowColor)
 headerLabel.grid(row=Layout.headerRow, column=0, columnspan=Layout.maxWidth, **paddings, sticky="ew")
@@ -399,46 +429,41 @@ connectLabel.grid(row=Layout.labelRow, column=Layout.connectionColumn, columnspa
 connectButton = tk.Button(root, text="Connect", command=connect, anchor='center', justify='center', fg=Fonts.selectorFontColor, font=(Fonts.selectorFontStyle, Fonts.selectorFontSize), bg=Colors.selectorRowColor)
 connectButton.grid(row=Layout.selectorRow, column=Layout.connectionColumn, rowspan=1, columnspan=Layout.connectionColumnSpan, **paddings, sticky="ew")
 
-# Control Panel Grid Vars
 # Control Panel
 controlPanel = tk.Frame(root, bg=Colors.controlPanelRowColor)
 controlPanel.grid(row=Layout.controlPanelRow, column=0, rowspan=1, columnspan=Layout.maxWidth, **paddings, sticky="ew")
 
 # Vertical Profile Command Shortcut
-verticalProfile = tk.Button(controlPanel, text="Vertical Profile", width=15, height=4, command=lambda: send("CMVPROF"))
+verticalProfile = tk.Button(controlPanel, text="Vertical Profile", width=15, height=4, command=lambda: send(Command.vertical_profile))
 verticalProfile.grid(row=Layout.verticalProfileRow, column=Layout.verticalProfileColumn,
                      rowspan=Layout.verticalProfileRowSpan, columnspan=Layout.verticalProfileColumnSpan, **paddings,
                      sticky="ew")
 
 # Up Button
-upButton = tk.Button(controlPanel, text="Up", width=4, height=1, command=lambda: send("CMEMPTY"))
+upButton = tk.Button(controlPanel, text="Up", width=4, height=1, command=lambda: send(Command.empty))
 upButton.grid(row=Layout.upButtonRow, column=Layout.upButtonColumn, rowspan=Layout.upButtonRowSpan,
               columnspan=Layout.upButtonColumnSpan, **paddings, sticky="ew")
 
 # Down Button
-downButton = tk.Button(controlPanel, text="Down", width=4, height=1, command=lambda: send("CMFILL"))
+downButton = tk.Button(controlPanel, text="Down", width=4, height=1, command=lambda: send(Command.fill))
 downButton.grid(row=Layout.downButtonRow, column=Layout.downButtonColumn, rowspan=Layout.downButtonRowSpan,
                 columnspan=Layout.downButtonColumnSpan, **paddings, sticky="ew")
 
 # Stop Button
-stopButton = tk.Button(controlPanel, text="Stop", width=Layout.stopButtonWidth, height=Layout.stopButtonHeight, command=lambda: send("CMSTOP"))
+stopButton = tk.Button(controlPanel, text="Stop", width=Layout.stopButtonWidth, height=Layout.stopButtonHeight, command=lambda: send(Command.stop))
 stopButton.grid(row=Layout.stopButtonRow, column=Layout.stopButtonColumn, rowspan=Layout.stopButtonRowSpan,
                 columnspan=Layout.stopButtonColumnSpan, **paddings, sticky="ew")
 
 # Up and Down (fill then empty)
-fillEmptyButton = tk.Button(controlPanel, text="Down / Up", width=Layout.fillEmptyButtonWidth, height=Layout.fillEmptyButtonHeight, command=lambda: send("CMDNUP"))
+fillEmptyButton = tk.Button(controlPanel, text="Down / Up", width=Layout.fillEmptyButtonWidth, height=Layout.fillEmptyButtonHeight, command=lambda: send(Command.down_up))
 fillEmptyButton.grid(row=Layout.fillEmptyButtonRow, column=Layout.fillEmptyButtonColumn, rowspan=Layout.fillEmptyButtonRowSpan, columnspan=Layout.fillEmptyButtonColumnSpan, **paddings, sticky="ew")
 
 # Move to center
-centerButton = tk.Button(controlPanel, text="Center", width=Layout.centerButtonWidth, height=Layout.centerButtonHeight, command=lambda: send("CMCNTR"))
+centerButton = tk.Button(controlPanel, text="Center", width=Layout.centerButtonWidth, height=Layout.centerButtonHeight, command=lambda: send(Command.center))
 centerButton.grid(row=Layout.centerButtonRow, column=Layout.centerButtonColumn, rowspan=Layout.centerButtonRowSpan, columnspan=Layout.centerButtonColumnSpan, **paddings, sticky="ew")
 
 
 # File Path
-# savePathScroll = Scrollbar(controlPanel, orient='horizontal')
-# savePathScroll.pack(side=BOTTOM, fill='x')
-# savePathScroll.config(command=text.xview)
-# , xscrollcommand=savePathScroll.set
 savePath = tk.Text(controlPanel, width=30, height=1)
 savePath.grid(row=Layout.savePathRow, column=Layout.savePathColumn, rowspan=1, columnspan=Layout.savePathColumnSpan,
               **paddings, sticky="ew")
@@ -460,8 +485,6 @@ getData.grid(row=Layout.getDataRow, column=Layout.getDataColumn, rowspan=Layout.
 controlPanel.grid_rowconfigure(0, weight=1)
 controlPanel.grid_columnconfigure(0, weight=1)
 
-#######################################################
-
 # Command Send Bar
 commandSend = tk.Entry(root, textvariable=active_command, width=Layout.commandSendWidth - 10)
 commandSend.grid(row=Layout.commandSendRow, column=0, rowspan=1, columnspan=Layout.commandSendColumnSpan, **paddings,
@@ -471,10 +494,6 @@ commandSend.grid(row=Layout.commandSendRow, column=0, rowspan=1, columnspan=Layo
 commandSendButton = tk.Button(root, text="Send", width=20, bg=Colors.commandSendRowColor, command=sendCommand)
 commandSendButton.grid(row=Layout.commandSendRow, column=Layout.commandSendColumnSpan, rowspan=1, columnspan=2,
                        **paddings, sticky="ew")
-
-# Command Send Indicator
-# commandSendIndicator = tk.Label(root, textvariable=command_send_status)
-# commandSendIndicator.grid(row=Layout.commandSendRow, column=Layout.commandSendColumnSpan+2, rowspan=1, columnspan=1, **paddings)
 
 # Communication Monitor
 communicationMonitor = tk.Text(root, width=Layout.commandSendWidth, height=1, padx=15, pady=15)
@@ -496,11 +515,13 @@ console.grid(row=Layout.consoleRow, column=Layout.serialMonitorColumnSpan, rowsp
              columnspan=Layout.consoleColumnSpan, **paddings, sticky="ew")
 console.insert(tk.END, "Console")
 console['state'] = 'disabled'
+# </editor-fold>
 
 #Set window properties
 root.grid_rowconfigure(Layout.maxHeight, weight=1)
 root.grid_columnconfigure(Layout.portColumn, weight=1)
 
+# Begin interval functions
 update_ports()
 read_serial()
 

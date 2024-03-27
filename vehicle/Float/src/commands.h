@@ -9,25 +9,25 @@ class commands {
   private: 
     struct floatCommands {
       byte index;
-      char code[9];
+      char code[8];
       bool warning;
     };
   public:
     static const byte commandLen = 13;
     const floatCommands command[commandLen] = {
       {0, "RESET", 0},
-      {1, "CMEMPTY", 0},
+      {1, "CMEMTY", 0},
       {2, "CMFILL", 0},
       {3, "CMSTOP", 0},
       {4, "GTTIME", 0},
-      {5, "GTPRESS", 0},
+      {5, "GTPRSS", 0},
       {6, "GTDTCT", 0},
       {7, "GTDATA", 0},
-      {10, "CONFIRM", 0},
+      {10, "CONFRM", 0},
       {11, "GTRESP", 0},
       {12, "BRDCST", 0},
-      {13, "CMVPROF", 0},
-      {20, "SMPDATA", 0}
+      {13, "CMVPRO", 0},
+      {20, "GTSDTA", 0}
     };
 
     void execute(byte code){
