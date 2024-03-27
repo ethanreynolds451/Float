@@ -13,7 +13,7 @@ class commands {
       bool warning;
     };
   public:
-    static const byte commandLen = 13;
+    static const byte commandLen = 15;
     const floatCommands command[commandLen] = {
       {0, "RESET", 0},
       {1, "CMEMTY", 0},
@@ -39,6 +39,8 @@ class commands {
         if(code = command[i].index){  // If numbers match
             strcpy(activeCommandCode, command[i].code);   // Set active command to current index
             break;
+         }
+      }
       if(code == 0){
         resetFunc();
       }
