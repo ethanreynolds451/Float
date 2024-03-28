@@ -57,7 +57,7 @@ void Float::update(){
     // While ascending, empty ballast until empty
     } else if ((reachedBottom)&&(! limitEmpty())){
       motion = 2;
-    // They can never happen at the same time bc. reachedBottom is bool
+    // They can never happen at the same time
     // Float is always filling or emptying until the limit is reached
     // When the limit is reached, it stops until state of reachedBottom changes
     } else {
@@ -69,7 +69,9 @@ void Float::update(){
       requestTransmission = true;
     }
   }
-  //checkInputs();
+  if(manualControl){
+    checkInputs();      // This is for manual hardware control
+  }
   if(fillEmpty){
     if(! filled){           // If it has not yet filled
         motion = 0;         // Fill until limit is reached
@@ -77,6 +79,13 @@ void Float::update(){
         motion = 2;         // Empty until the limit is reached
     } else {                // Once it has filled and emptied
         fillEmpty = false;  // Break sequence
+    }
+  }
+  if(goToCenter){
+    if(! emptied){      // If it has not yet emptied
+        motion = 2;     // Empty until limit is reached
+    } else {            // Once it has emptied
+        goToCenter = false; // Break sequence
     }
   }
   if(motion == 1){
@@ -94,10 +103,6 @@ bool Float::readCommand(){
   if(radio.available() > 0){
     //First, read the incomming data (automatically calls serialWait())
     radio.readData(dataIn, 64);
-    //Send a confirmation message that the data was recieved and wait for it to send
-    radio.send("Transmission Recieved");
-    radio.waitSent();
-    
     // Debug, sends length of recieved data
       //char tmp[3];
       //itoa(strlen(dataIn), tmp, 10);
@@ -109,10 +114,14 @@ bool Float::readCommand(){
       if(strncmp(dataIn, c.command[i].code, strlen(dataIn)) == 0){  // If strings match
         activeCommand = c.command[i].index;   // Set active command to current index
         broadcast = false; // Stop broadcasting
+        manualControl = false; // Disable manual control
       // char tmp[3];
       // itoa(activeCommand, tmp, 10);
       // radio.send(tmp);
       // radio.waitSent();
+        //Send a confirmation message that the data was recieved and wait for it to send
+        radio.send("Command Recieved");
+        radio.waitSent();
         return true;
       }
     }

@@ -26,6 +26,7 @@ const int dataLimit = 50;                                 /* Maximum quantity of
                                                           */
 // Control Variables
 bool broadcast = true;              // Start off broadcasting every 5 minutes
+bool manualControl = true;          // Allow manual control until first transmission is recieved
 bool requestTransmission = false;   // When data is recorded and waiting to transmit
 bool verticalProfile = false;       // Execute vertical profile functions
 bool goToCenter = false;            // Empty float then move to center position
@@ -35,6 +36,7 @@ bool emptied = false;
 bool reachedBottom = false;         // Start going up when float reaches bottom
 bool reachedSurface = false;        // Verical profile completed when surface reached
 byte motion = 1;  
+
 byte dataSendDelay = 100;           // How many milliseconds to wait between data packet transmission
 
 // Pin Definitions

@@ -1,3 +1,11 @@
 Each function is responsible for initializing flags as required when it is called.
-Function will not reset the flags after they have terminated.
+Functions will not reset flags after they have terminated.
 No infinite loops!
+
+NEED TO ADD FUNCTION TO HALT CONFLICTING PROCESSES WHEN NEW COMMAND IS RECIEVED!
+
+Figure out best way to get to half full. Does it need a physical switch?
+Using tone library, steps are not counted, but frequency is known so rotation can be calculated
+However, if stepper skips steps, it will be inacurate.
+Doesnt need to be perfect, just used to callibrate buoyancy
+Might not even use at all

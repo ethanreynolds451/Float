@@ -223,9 +223,9 @@ def update_ports():
         menu.add_command(label=port, command=lambda value=port: [Float_port.set(value), disconnect()])
     root.after(3000, update_ports)
 
-def create_colored_frame(parent, row, color):
+def create_colored_frame(parent, row, span, color):
     frame = tk.Frame(parent, bg=color)
-    frame.grid(row=row, column=0, columnspan=Layout.maxWidth, sticky="nsew")
+    frame.grid(row=row, column=0, rowspan=span, columnspan=Layout.maxWidth, sticky="nsew")
     return frame
 
 def select_directory():
@@ -286,6 +286,7 @@ def get_data():
 # <editor-fold desc="UI Layout">
 # Tkinter widget layout
 class Layout:
+    # <editor-fold desc="Header">
     maxWidth = 8
     maxHeight = 6
     headerRow = 0
@@ -299,19 +300,11 @@ class Layout:
     addressColumnSpan = 1
     connectionColumn = portColumnSpan + baudColumnSpan + addressColumnSpan
     connectionColumnSpan = 1
-    controlPanelRow = 3
-    commandSendRow = 4
-    commandSendColumnSpan = 5
-    dataMonitorRow = 5
-    dataMonitorColumnSpan = commandSendColumnSpan
-    serialMonitorRow = 6
-    serialMonitorColumnSpan = commandSendColumnSpan
-    consoleRow = 5
-    consoleColumnSpan = 3
-    consoleRowSpan = 2
+    # </editor-fold>
 
-    commandSendWidth = 50
-    consoleHeight = 10
+    # <editor-fold desc="Control panel">
+    controlPanelRow = 3
+    controlPanelRowSpan = 1
 
     verticalProfileRow = 0
     verticalProfileColumn = 0
@@ -368,40 +361,74 @@ class Layout:
     resetButtonColumn = directorySelectColumn
     resetButtonRowSpan = getDataRowSpan
     resetButtonColumnSpan = directorySelectColumnSpan
+    # </editor-fold>
+
+    # <editor-fold desc="Communication Panel">
+    communicationPanelRow = controlPanelRow + controlPanelRowSpan
+    communicationPanelRowSpan = maxWidth
+
+    commandSendRow = 1
+    commandSendRowSpan = 1
+    commandSendColumn = 0
+    commandSendColumnSpan = int(communicationPanelRowSpan / 2)
+    commandSendWidth = 50
+
+    dataMonitorRow = commandSendRow + commandSendRowSpan
+    dataMonitorRowSpan = 1
+    dataMonitorColumn = commandSendColumn
+    dataMonitorColumnSpan = commandSendColumnSpan
+    dataMonitorWidth = commandSendWidth
+
+    serialMonitorRow = dataMonitorRow + dataMonitorRowSpan
+    serialMonitorRowSpan = 1
+    serialMonitorColumn = commandSendColumn
+    serialMonitorColumnSpan = commandSendColumnSpan
+    serialMonitorWidth = commandSendWidth
+    serialMonitorHeight = 20
+
+    commandSendButtonRow = commandSendRow
+    commandSendButtonRowSpan = 1
+    commandSendButtonColumn = commandSendColumnSpan
+    commandSendButtonColumnSpan = 2
+    commandSendButtonWidth = 8
+
+    consoleRow = commandSendButtonRow + commandSendButtonRowSpan
+    consoleRowSpan = serialMonitorRowSpan + commandSendButtonRowSpan
+    consoleColumnSpan = int(communicationPanelRowSpan / 2)
+    consoleHeight = 10
+    # </editor-fold>
 
 # Fonts
 class Fonts:
     headerFontSize = 32
     headerFontStyle = "Comic Sans"
-    headerFontColor = "red"
+    headerFontColor = "white"
     labelFontSize = 18
     labelFontStyle = "Comic Sans"
-    labelFontColor = "orange"
+    labelFontColor = "black"
     selectorFontSize = 14
     selectorFontStyle = "Comic Sans"
     selectorFontColor = "black"
 
 # Colors
 class Colors:
-    headerRowColor = "yellow"
-    labelRowColor = "#24BAD6"
-    selectorRowColor = "#24BAD6"
-    controlPanelRowColor = "#2784CF"
-    commandSendRowColor = "orange"
-    consoleRowColor = "red"
+    headerRowColor = "#2784CF"
+    labelRowColor = "yellow"
+    selectorRowColor = "orange"
+    controlPanelRowColor = "red"
+    communicationPanelColor = "#24BAD6"
     # Create colored backgrounds
-    headerColor = create_colored_frame(root, Layout.headerRow, headerRowColor)
-    labelsColor = create_colored_frame(root, Layout.labelRow, labelRowColor)
-    selectorColor = create_colored_frame(root, Layout.selectorRow, selectorRowColor)
-    controlPanelColor = create_colored_frame(root, Layout.controlPanelRow, controlPanelRowColor)
-    commandSendColor = create_colored_frame(root, Layout.commandSendRow, commandSendRowColor)
-    consoleColor = create_colored_frame(root, Layout.consoleRow, consoleRowColor)
-    serialMonitorColor = create_colored_frame(root, Layout.serialMonitorRow, consoleRowColor)
+    createHeaderColor = create_colored_frame(root, Layout.headerRow, 1, headerRowColor)
+    createLabelColor = create_colored_frame(root, Layout.labelRow, 1, labelRowColor)
+    createSelectorColor = create_colored_frame(root, Layout.selectorRow, 1, selectorRowColor)
+    createControlPanelColor = create_colored_frame(root, Layout.controlPanelRow, 1, controlPanelRowColor)
+    createCommandSendColor = create_colored_frame(root, Layout.communicationPanelRow, Layout.communicationPanelRowSpan, communicationPanelColor)
 
 paddings = {'padx': 5, 'pady': 5}
 # </editor-fold>
 
 # <editor-fold desc="Tkinter Widgets">
+# <editor-fold desc="Header">
 # Header
 headerLabel = tk.Label(root, text="Sound School Ocean Engineering", fg=Fonts.headerFontColor, font=(Fonts.headerFontStyle, Fonts.headerFontSize), justify='center', bg=Colors.headerRowColor)
 headerLabel.grid(row=Layout.headerRow, column=0, columnspan=Layout.maxWidth, **paddings, sticky="ew")
@@ -433,8 +460,9 @@ connectLabel = tk.Label(root, textvariable=connection_status, anchor='center', j
 connectLabel.grid(row=Layout.labelRow, column=Layout.connectionColumn, columnspan=Layout.connectionColumnSpan, **paddings, sticky="ew")
 connectButton = tk.Button(root, text="Connect", command=connect, anchor='center', justify='center', fg=Fonts.selectorFontColor, font=(Fonts.selectorFontStyle, Fonts.selectorFontSize), bg=Colors.selectorRowColor)
 connectButton.grid(row=Layout.selectorRow, column=Layout.connectionColumn, rowspan=1, columnspan=Layout.connectionColumnSpan, **paddings, sticky="ew")
+# </editor-fold>
 
-# Control Panel
+# <editor-fold desc="Control Panel">
 controlPanel = tk.Frame(root, bg=Colors.controlPanelRowColor)
 controlPanel.grid(row=Layout.controlPanelRow, column=0, rowspan=1, columnspan=Layout.maxWidth, **paddings, sticky="ew")
 
@@ -467,7 +495,6 @@ fillEmptyButton.grid(row=Layout.fillEmptyButtonRow, column=Layout.fillEmptyButto
 centerButton = tk.Button(controlPanel, text="Center", width=Layout.centerButtonWidth, height=Layout.centerButtonHeight, command=lambda: send(Command.center))
 centerButton.grid(row=Layout.centerButtonRow, column=Layout.centerButtonColumn, rowspan=Layout.centerButtonRowSpan, columnspan=Layout.centerButtonColumnSpan, **paddings, sticky="ew")
 
-
 # File Path
 savePath = tk.Text(controlPanel, width=30, height=1)
 savePath.grid(row=Layout.savePathRow, column=Layout.savePathColumn, rowspan=1, columnspan=Layout.savePathColumnSpan,
@@ -493,42 +520,50 @@ resetButton.grid(row=Layout.resetButtonRow, column=Layout.resetButtonColumn, row
 
 controlPanel.grid_rowconfigure(0, weight=1)
 controlPanel.grid_columnconfigure(0, weight=1)
+# </editor-fold>
+
+# <editor-fold desc="Communication Panel">
+communicationPanel = tk.Frame(root, bg=Colors.communicationPanelColor)
+communicationPanel.grid(row=Layout.communicationPanelRow, column=0, rowspan=Layout.communicationPanelRowSpan, columnspan=Layout.maxWidth, **paddings, sticky="ew")
 
 # Command Send Bar
-commandSend = tk.Entry(root, textvariable=active_command, width=Layout.commandSendWidth - 10)
-commandSend.grid(row=Layout.commandSendRow, column=0, rowspan=1, columnspan=Layout.commandSendColumnSpan, **paddings,
+commandSend = tk.Entry(communicationPanel, textvariable=active_command, width=Layout.commandSendWidth - 10)
+commandSend.grid(row=Layout.commandSendRow, column=Layout.commandSendColumn, rowspan=Layout.commandSendColumnSpan, columnspan=Layout.commandSendColumnSpan, **paddings,
                  sticky="ew")
 
 # Command Send Button
-commandSendButton = tk.Button(root, text="Send", width=20, bg=Colors.commandSendRowColor, command=sendCommand)
-commandSendButton.grid(row=Layout.commandSendRow, column=Layout.commandSendColumnSpan, rowspan=1, columnspan=2,
-                       **paddings, sticky="ew")
+commandSendButton = tk.Button(communicationPanel, text="Send", width=Layout.commandSendButtonWidth, bg=Colors.communicationPanelColor, command=sendCommand)
+commandSendButton.grid(row=Layout.commandSendButtonRow, column=Layout.commandSendButtonColumn, rowspan=Layout.commandSendButtonRowSpan, columnspan=Layout.commandSendButtonColumnSpan, **paddings, sticky="ew")
 
 # Communication Monitor
-communicationMonitor = tk.Text(root, width=Layout.commandSendWidth, height=1, padx=15, pady=15)
-communicationMonitor.grid(row=Layout.dataMonitorRow, column=0, rowspan=1, columnspan=Layout.dataMonitorColumnSpan,
+communicationMonitor = tk.Text(communicationPanel, width=Layout.serialMonitorWidth, height=1, padx=15, pady=15)
+communicationMonitor.grid(row=Layout.dataMonitorRow, column=Layout.dataMonitorColumn, rowspan=Layout.dataMonitorRowSpan, columnspan=Layout.dataMonitorColumnSpan,
                           **paddings, sticky="ew")
 communicationMonitor.insert(tk.END, "Float Messages")
 communicationMonitor['state'] = 'disabled'
 
 # Serial Monitor
-serialMonitor = tk.Text(root, width=Layout.commandSendWidth, padx=15, pady=15)
-serialMonitor.grid(row=Layout.serialMonitorRow, column=0, rowspan=1, columnspan=Layout.serialMonitorColumnSpan,
+serialMonitor = tk.Text(communicationPanel, width=Layout.serialMonitorWidth, height=Layout.serialMonitorHeight, padx=15, pady=15)
+serialMonitor.grid(row=Layout.serialMonitorRow, column=Layout.serialMonitorColumn, rowspan=Layout.serialMonitorRow, columnspan=Layout.serialMonitorColumnSpan,
                    **paddings, sticky="ew")
 serialMonitor.insert(tk.END, "Serial Monitor")
 serialMonitor['state'] = 'disabled'
 
 # Console
-console = tk.Text(root, width=30, padx=15, pady=15)
+console = tk.Text(communicationPanel, width=30, padx=15, pady=15)
 console.grid(row=Layout.consoleRow, column=Layout.serialMonitorColumnSpan, rowspan=Layout.consoleRowSpan,
              columnspan=Layout.consoleColumnSpan, **paddings, sticky="ew")
 console.insert(tk.END, "Console")
 console['state'] = 'disabled'
+
+communicationPanel.grid_rowconfigure(0, weight=1)
+communicationPanel.grid_columnconfigure(0, weight=1)
 # </editor-fold>
 
 #Set window properties
 root.grid_rowconfigure(Layout.maxHeight, weight=1)
 root.grid_columnconfigure(Layout.portColumn, weight=1)
+# </editor-fold>
 
 # Begin interval functions
 update_ports()

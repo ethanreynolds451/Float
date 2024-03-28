@@ -28,15 +28,15 @@ class commands {
       {11, "GTRESP", 0},
       {12, "BRDCST", 0},
       {13, "CMVPRO", 0},
-      {14, "CMUPDN", 0},    // Just added, need to link
+      {14, "CMDNUP", 0},    // Just added, need to link
       {20, "GTSDTA", 0}
     };
 
     void execute(byte code){
-      // convert code to command, NOT YET ACTIVE
+      // convert code to command, NOT YET ACTIVE, NEED TO TEST
       char activeCommandCode[8] = "";
       for(int i = 0; i < commandLen; i++){  // For number of potential commands
-        if(code = command[i].index){  // If numbers match
+        if(code == command[i].index){  // If numbers match
             strcpy(activeCommandCode, command[i].code);   // Set active command to current index
             break;
          }
@@ -54,6 +54,7 @@ class commands {
         motion = 1; 
       }
       if(code == 4){
+        emptied = false;
         goToCenter = true;
       }
       if(code == 5){
