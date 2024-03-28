@@ -103,6 +103,11 @@ def console_println(message):
     console['state'] = 'disabled'
     console.yview_pickplace("end")
 
+def console_clear():
+    console['state'] = 'normal'
+    console.delete("1.0", "end")
+    console['state'] = 'disabled'
+
 def get_ports():
     global ports
     ports.clear()
@@ -151,6 +156,11 @@ def serialMonitor_println(message):
     serialMonitor.insert(tk.END, "\n"+message)
     serialMonitor['state'] = 'disabled'
     serialMonitor.yview_pickplace("end")
+
+def serialMonitor_clear():
+    serialMonitor['state'] = 'normal'
+    serialMonitor.delete("1.0", "end")
+    serialMonitor['state'] = 'disabled'
 
 def send(data):
     try:
@@ -370,32 +380,41 @@ class Layout:
     commandSendRow = 1
     commandSendRowSpan = 1
     commandSendColumn = 0
-    commandSendColumnSpan = int(communicationPanelRowSpan / 2)
-    commandSendWidth = 50
+    commandSendColumnSpan = int(communicationPanelRowSpan / 2) - 2
+    commandSendWidth = 20
 
     dataMonitorRow = commandSendRow + commandSendRowSpan
     dataMonitorRowSpan = 1
     dataMonitorColumn = commandSendColumn
-    dataMonitorColumnSpan = commandSendColumnSpan
+    dataMonitorColumnSpan = int(communicationPanelRowSpan / 2)
     dataMonitorWidth = commandSendWidth
+    dataMonitorHeight = 1
 
     serialMonitorRow = dataMonitorRow + dataMonitorRowSpan
     serialMonitorRowSpan = 1
     serialMonitorColumn = commandSendColumn
-    serialMonitorColumnSpan = commandSendColumnSpan
+    serialMonitorColumnSpan = dataMonitorColumnSpan
     serialMonitorWidth = commandSendWidth
-    serialMonitorHeight = 20
+    serialMonitorHeight = 15
 
     commandSendButtonRow = commandSendRow
     commandSendButtonRowSpan = 1
-    commandSendButtonColumn = commandSendColumnSpan
+    commandSendButtonColumn = commandSendColumn + commandSendColumnSpan
     commandSendButtonColumnSpan = 2
     commandSendButtonWidth = 8
 
-    consoleRow = commandSendButtonRow + commandSendButtonRowSpan
+    consoleRow = commandSendRow + commandSendRowSpan
     consoleRowSpan = serialMonitorRowSpan + commandSendButtonRowSpan
+    consoleColumn = serialMonitorColumnSpan
     consoleColumnSpan = int(communicationPanelRowSpan / 2)
-    consoleHeight = 10
+    consoleWidth = 30
+    consoleHeight = 20
+
+    clearButtonRow = commandSendRow
+    clearButtonRowSpan = 1
+    clearButtonColumn = consoleColumn
+    clearButtonColumnSpan = 2
+    clearButtonWidth = 8
     # </editor-fold>
 
 # Fonts
@@ -527,8 +546,8 @@ communicationPanel = tk.Frame(root, bg=Colors.communicationPanelColor)
 communicationPanel.grid(row=Layout.communicationPanelRow, column=0, rowspan=Layout.communicationPanelRowSpan, columnspan=Layout.maxWidth, **paddings, sticky="ew")
 
 # Command Send Bar
-commandSend = tk.Entry(communicationPanel, textvariable=active_command, width=Layout.commandSendWidth - 10)
-commandSend.grid(row=Layout.commandSendRow, column=Layout.commandSendColumn, rowspan=Layout.commandSendColumnSpan, columnspan=Layout.commandSendColumnSpan, **paddings,
+commandSend = tk.Entry(communicationPanel, textvariable=active_command, width=Layout.commandSendWidth)
+commandSend.grid(row=Layout.commandSendRow, column=Layout.commandSendColumn, rowspan=Layout.commandSendRowSpan, columnspan=Layout.commandSendColumnSpan, **paddings,
                  sticky="ew")
 
 # Command Send Button
@@ -536,7 +555,7 @@ commandSendButton = tk.Button(communicationPanel, text="Send", width=Layout.comm
 commandSendButton.grid(row=Layout.commandSendButtonRow, column=Layout.commandSendButtonColumn, rowspan=Layout.commandSendButtonRowSpan, columnspan=Layout.commandSendButtonColumnSpan, **paddings, sticky="ew")
 
 # Communication Monitor
-communicationMonitor = tk.Text(communicationPanel, width=Layout.serialMonitorWidth, height=1, padx=15, pady=15)
+communicationMonitor = tk.Text(communicationPanel, width=Layout.dataMonitorWidth, height=Layout.dataMonitorHeight, padx=15, pady=15)
 communicationMonitor.grid(row=Layout.dataMonitorRow, column=Layout.dataMonitorColumn, rowspan=Layout.dataMonitorRowSpan, columnspan=Layout.dataMonitorColumnSpan,
                           **paddings, sticky="ew")
 communicationMonitor.insert(tk.END, "Float Messages")
@@ -544,17 +563,20 @@ communicationMonitor['state'] = 'disabled'
 
 # Serial Monitor
 serialMonitor = tk.Text(communicationPanel, width=Layout.serialMonitorWidth, height=Layout.serialMonitorHeight, padx=15, pady=15)
-serialMonitor.grid(row=Layout.serialMonitorRow, column=Layout.serialMonitorColumn, rowspan=Layout.serialMonitorRow, columnspan=Layout.serialMonitorColumnSpan,
-                   **paddings, sticky="ew")
+serialMonitor.grid(row=Layout.serialMonitorRow, column=Layout.serialMonitorColumn, rowspan=Layout.serialMonitorRow, columnspan=Layout.serialMonitorColumnSpan, **paddings, sticky="ew")
 serialMonitor.insert(tk.END, "Serial Monitor")
 serialMonitor['state'] = 'disabled'
 
 # Console
-console = tk.Text(communicationPanel, width=30, padx=15, pady=15)
-console.grid(row=Layout.consoleRow, column=Layout.serialMonitorColumnSpan, rowspan=Layout.consoleRowSpan,
+console = tk.Text(communicationPanel, width=Layout.consoleWidth, height=Layout.consoleHeight, padx=15, pady=15)
+console.grid(row=Layout.consoleRow, column=Layout.consoleColumn, rowspan=Layout.consoleRowSpan,
              columnspan=Layout.consoleColumnSpan, **paddings, sticky="ew")
 console.insert(tk.END, "Console")
 console['state'] = 'disabled'
+
+# Clear Button
+clearButton = tk.Button(communicationPanel, text="Clear", width=Layout.clearButtonWidth, bg=Colors.communicationPanelColor, command=lambda: [console_clear(),serialMonitor_clear()])
+clearButton.grid(row=Layout.clearButtonRow, column=Layout.clearButtonColumn, rowspan=Layout.clearButtonRowSpan, columnspan=Layout.clearButtonColumnSpan, **paddings, sticky="ew")
 
 communicationPanel.grid_rowconfigure(0, weight=1)
 communicationPanel.grid_columnconfigure(0, weight=1)
