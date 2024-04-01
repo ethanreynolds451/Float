@@ -22,40 +22,41 @@ void Float::update(){
   checkLimits();
   if(everyFive()){
     // Start off by broadcasting company data every five seconds
-    if(broadcast){
+    if(flag.broadcast){
       broadcastCompanyData();
     }
     // When doing vertical profile, capture data every five seconds
-    if(verticalProfile){
+    if(flag.verticalProfile){
       recordData();
     }
     // When vertical profile is completed, send data transmission request every five seconds
-    if(requestTransmission){
+    if(flag.requestTransmission){
       requestTransmitData();
     }
   }
   if(readCommand()){
     if(! c.overrideRequired(activeCommand)){
+      c.stopFunctions();
       c.execute(activeCommand);
     } else {
       c.confirmAction();
     }
   }
   // Vertical profile operations
-  if(verticalProfile){
+  if(flag.verticalProfile){
     // If it has reached the bottom, start going up
     if(readPressure() >= (9780*(float(profileDepth - profileBuffer)))){
-      reachedBottom = true;
+      flag.reachedBottom = true;
     }
     // If it has reached the surface, stop recording data and request transmission
-    if(reachedBottom&&(readPressure() <= (9780*(float(profileBuffer))))){
-      reachedSurface = true;
+    if(flag.reachedBottom&&(readPressure() <= (9780*(float(profileBuffer))))){
+      flag.reachedSurface = true;
     }
     // While decending, fill ballast until it is full
-    if((! reachedBottom)&&(! limitFull())){
+    if((! flag.reachedBottom)&&(! limitFull())){
       motion = 0;
     // While ascending, empty ballast until empty
-    } else if ((reachedBottom)&&(! limitEmpty())){
+    } else if ((flag.reachedBottom)&&(! limitEmpty())){
       motion = 2;
     // They can never happen at the same time
     // Float is always filling or emptying until the limit is reached
@@ -64,29 +65,31 @@ void Float::update(){
       motion = 1;
     }
     // Exit loop when float has reached the surface
-    if(reachedSurface == true){
-      verticalProfile = false;
-      requestTransmission = true;
+    if(flag.reachedSurface == true){
+      flag.verticalProfile = false;
+      flag.requestTransmission = true;
     }
   }
-  if(manualControl){
-    checkInputs();      // This is for manual hardware control
-  }
-  if(fillEmpty){
-    if(! filled){           // If it has not yet filled
+  if(flag.fillEmpty){
+    if(! flag.filled){           // If it has not yet filled
         motion = 0;         // Fill until limit is reached
-    } else if(! emptied) {  // Once it has filled
+    } else if(! flag.emptied) {  // Once it has filled
         motion = 2;         // Empty until the limit is reached
     } else {                // Once it has filled and emptied
-        fillEmpty = false;  // Break sequence
+        flag.fillEmpty = false;  // Break sequence
+        radio.send("Completed Up / Down Sequence");
+        radio.waitSent();
     }
   }
-  if(goToCenter){
-    if(! emptied){      // If it has not yet emptied
+  if(flag.goToCenter){
+    if(! flag.emptied){      // If it has not yet emptied
         motion = 2;     // Empty until limit is reached
     } else {            // Once it has emptied
-        goToCenter = false; // Break sequence
+        flag.goToCenter = false; // Break sequence
     }
+  }
+  if(flag.manualControl){
+    checkInputs();      // This is for manual hardware control
   }
   if(motion == 1){
     stop();
@@ -113,14 +116,16 @@ bool Float::readCommand(){
     for(int i = 0; i < c.commandLen; i++){  // For number of potential commands
       if(strncmp(dataIn, c.command[i].code, strlen(dataIn)) == 0){  // If strings match
         activeCommand = c.command[i].index;   // Set active command to current index
-        broadcast = false; // Stop broadcasting
-        manualControl = false; // Disable manual control
+        flag.broadcast = false; // Stop broadcasting
+        flag.manualControl = false; // Disable manual control
       // char tmp[3];
       // itoa(activeCommand, tmp, 10);
       // radio.send(tmp);
       // radio.waitSent();
         //Send a confirmation message that the data was recieved and wait for it to send
-        radio.send("Command Recieved");
+        radio.dataAdd("Executing ");
+        radio.dataAdd(dataIn);
+        radio.dataSend();
         radio.waitSent();
         return true;
       }
@@ -231,14 +236,14 @@ bool Float::checkLimits(){
   // If it is going down and hits the lower limit, stop
   if((digitalRead(limitEmptyPin) == 0)&&(motion == 2)){
     stop();
-    emptied = true;
+    flag.emptied = true;
     motion = 1;
     return true;
   }
   // If it is going up and hits the upper limit, stop
   if((digitalRead(limitFullPin) == 0)&&(motion == 0)){
     stop();
-    filled = true;
+    flag.filled = true;
     motion = 1;
     return true;
   }

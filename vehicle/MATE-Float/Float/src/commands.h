@@ -33,6 +33,7 @@ class commands {
     };
 
     void execute(byte code){
+      stopFunctions();      // Halt any other function running
       // convert code to command, NOT YET ACTIVE, NEED TO TEST
       char activeCommandCode[8] = "";
       for(int i = 0; i < commandLen; i++){  // For number of potential commands
@@ -54,8 +55,8 @@ class commands {
         motion = 1; 
       }
       if(code == 4){
-        emptied = false;
-        goToCenter = true;
+        flag.emptied = false;
+        flag.goToCenter = true;
       }
       if(code == 5){
         sendTime();
@@ -83,22 +84,31 @@ class commands {
         sendConfirmation();
       } 
       if(code == 12){
-        broadcast = true;
+        flag.broadcast = true;
       } 
       if(code == 13){
-        reachedBottom = false;
-        verticalProfile = true;
+        flag.reachedBottom = false;
+        flag.reachedSurface = false;
+        flag.verticalProfile = true;
       }
       if(code == 14){
-        filled = false;     // Start out assuming it is not full
-        emptied = false;
-        fillEmpty = true;    // Execute fill - empty sequence
+        flag.filled = false;     // Start out assuming it is not full
+        flag.emptied = false;
+        flag.fillEmpty = true;    // Execute fill - empty sequence
       }
       if(code == 20){
         getSampleData();
       }
     }
 
+    void stopFunctions(){
+        flag.manualControl = false;          // Allow manual control until first transmission is recieved
+        flag.requestTransmission = false;   // When data is recorded and waiting to transmit
+        flag.broadcast = false;              // Start off broadcasting every 5 minutes
+        flag.verticalProfile = false;       // Execute vertical profile functions
+        flag.goToCenter = false;            // Empty float then move to center position
+        flag.fillEmpty = false;             // Fill then empty ballast tank
+    }
 
     void sendTime(){
       clear(dataString, dataLength);
@@ -116,7 +126,7 @@ class commands {
     }
     
     void transmitData(){ 
-      requestTransmission = false;
+      flag.requestTransmission = false;
       int dataIndex = dataCount;  // Create variable to keep track of total number of data packets
       while(dataIndex >= 0){ // Do this until all the data has been sent
         getDataString(dataIndex);  // Turn the data at specified index into a string with header

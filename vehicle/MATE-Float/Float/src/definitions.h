@@ -24,18 +24,25 @@ const int dataLimit = 50;                                 /* Maximum quantity of
                                                              All data storage space is allocated at compilation
                                                              Adjust this value to fit Arduino memory
                                                           */
-// Control Variables
-bool broadcast = true;              // Start off broadcasting every 5 minutes
-bool manualControl = true;          // Allow manual control until first transmission is recieved
-bool requestTransmission = false;   // When data is recorded and waiting to transmit
-bool verticalProfile = false;       // Execute vertical profile functions
-bool goToCenter = false;            // Empty float then move to center position
-bool fillEmpty = false;             // Fill then empty ballast tank
-bool filled = false;
-bool emptied = false;
-bool reachedBottom = false;         // Start going up when float reaches bottom
-bool reachedSurface = false;        // Verical profile completed when surface reached
-byte motion = 1;  
+
+class Flag {
+    public:
+        bool manualControl = true;          // Allow manual control until first transmission is recieved
+        bool requestTransmission = false;   // When data is recorded and waiting to transmit
+        bool broadcast = true;              // Start off broadcasting every 5 minutes
+        bool verticalProfile = false;       // Execute vertical profile functions
+        bool goToCenter = false;            // Empty float then move to center position
+        bool fillEmpty = false;             // Fill then empty ballast tank
+        // INDICATOR variables
+        bool filled = false;
+        bool emptied = false;
+        bool reachedBottom = false;         // Start going up when float reaches bottom
+        bool reachedSurface = false;        // Verical profile completed when surface reached
+};
+
+Flag flag;      // Create instance of flag class
+
+byte motion = 1;
 
 byte dataSendDelay = 100;           // How many milliseconds to wait between data packet transmission
 

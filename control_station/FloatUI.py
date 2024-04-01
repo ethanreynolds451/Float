@@ -116,9 +116,10 @@ def get_ports():
     for i in p:
         for x in i:
             if x != "n/a":
-                if "dev" in x:
-                    x = re.sub(".cu.", "/tty.", x)
-                    ports.append(x)
+                # if "dev" in x: # THIS DOESNT WORK ON WINDOWS
+                # Needed for serial on Mac - renames port so it can connect, but only if .cu is found
+                x = re.sub(".cu.", "/tty.", x)
+                ports.append(x)
 
 def disconnect(*args):
     Float.close()
