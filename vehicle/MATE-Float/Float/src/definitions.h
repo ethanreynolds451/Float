@@ -15,11 +15,14 @@ Tone stepper;                     // Create tone instance for stepper control
 
 // User Defined Variables
 int timeZoneOffset = +5;                                  // Time to be used for time zone correction
-const int pressureRange[] = {100, 921};                   // Analog read range for pressure sensor
-float profileDepth = 1;                                   // Depth of pool in m
+const int pressureRange[2] = {96, 921};                   // Analog read range for pressure sensor
+float profileDepth = 2;                                   // Depth of pool in m
 float profileBuffer = 0.25;                               // Window in which float will change direction
-const int dataLength = 27;                                // Define length of data packet
+float kpa_to_m = 9.78;
+const int dataLength = 64;                                // Define length of data packet
 const char companyData[dataLength] = "Hello World";       // Data that will be broadcasted before vertical profile
+const int speedFactor = 100;
+const int default_speed = 50;
 const int dataLimit = 50;                                 /* Maximum quantity of data values to be recorded on vertical profile
                                                              All data storage space is allocated at compilation
                                                              Adjust this value to fit Arduino memory
@@ -37,12 +40,12 @@ class Flag {
         bool filled = false;
         bool emptied = false;
         bool reachedBottom = false;         // Start going up when float reaches bottom
-        bool reachedSurface = false;        // Verical profile completed when surface reached
 };
 
 Flag flag;      // Create instance of flag class
 
 byte motion = 1;
+int speed = default_speed;
 
 byte dataSendDelay = 100;           // How many milliseconds to wait between data packet transmission
 
@@ -57,18 +60,20 @@ const byte controlFillPin = 8;
 const byte directionPin = 10;
 const byte speedPin = 11;
 const byte enablePin = 12;
-const int speedFactor = 50;
 const byte pressurePin = A0;
+const byte speedControlPin = A2;
 
 // Communication and data management
 char dataString[dataLength] = "";         // Create string to hold data
 const int dataInLen = 64;                 // Length of buffer to hold incoming transmissions
 char dataIn[dataInLen];                   // Buffer to hold incomming transmissions
 struct dataArray {                        // Allocate storage for recording data
-  byte hour[dataLimit];
-  byte minute[dataLimit];
-  byte second[dataLimit];
-  int pressure[dataLimit];
+  uint8_t hour[dataLimit] : 6;
+  uint8_t minute[dataLimit] : 6;
+  uint8_t second[dataLimit] : 6;
+  uint8_t pressure_int[dataLimit] : 8;
+  uint8_t pressure_decimal[dataLimit] : 4;
+  uint8_t recieved[dataLimit] : 2;
 };
 dataArray data;                            // Create instance of dataArray named 'data'
 byte failedSendAttempts = 0;
@@ -106,22 +111,25 @@ void broadcastCompanyData() {
 }
 
 void requestTransmitData() {
-  radio.dataAdd("RQTRANSMISSION=");
+  radio.dataAdd("RQTX=");
   char dc[4];
   itoa(dataCount, dc, 10);
   radio.dataAdd(dc);
   radio.dataSend();
 }
 
-int readPressure() {
+float readPressure() {
   /* Sensor returns linear 0.5 to 4.5 V, 0 to 100 PSI
      Maps input values from lower / upper analog read limit to scale of 1000, which will equal tenths of PSI
      Multiplies by 689.5 to convert to PA
   */
-  return (689.5 * map(analogRead(pressurePin), pressureRange[0], pressureRange[1], 0, 1000)); // 1 psi = 6894.76 pa
+  //return map(analogRead(pressurePin), pressureRange[0], pressureRange[1], 0, 100);
+  // Round it to one decimal place
+  return float(round(float(0.689476 * map(analogRead(pressurePin), pressureRange[0], pressureRange[1], 0, 1000))*10)/10); // 1 psi = 6894.76 pa
 }
 
-int fiveSecondCounter = 0;
+unsigned long fiveSecondCounter = 0;
+
 bool everyFive() {
   // If the RTC is working, use the second counter to time actions at 5 second intervals
   if (RTC.isRunning()) {
@@ -170,29 +178,28 @@ void timeToString(char* result, int hr, int mn, int sc) {
   strcat(result, ":");
 }
 
-pressureToString(char* result, int pr) {
-  if (pr < 10) {
-    strcat(result, "0000");
-  } else if (pr < 100) {
-    strcat(result, "000");
-  } else if (pr < 1000) {
-    strcat(result, "00");
-  } else if (pr < 10000) {
-    strcat(result, "0");
-  }
-  char pCh[6];
-  itoa(pr, pCh, 10);
+void pressureToString(char* result, int index) {
+  char pCh[4];              // Allocate enough space to hold largest possible
+  itoa(data.pressure_int[index], pCh, 10);
+  //dtostrf(pr, 3, 1, pCh);
+  strcat(result, pCh);
+  itoa(data.pressure_decimal[index], pCh, 10);
   strcat(result, pCh);
 }
 
 void getDataString(int index) {
   clear(dataString, dataLength);
-  strcat(dataString, "RA01,UTC=");
+  strcat(dataString, "DATA-);
+  char dCt[3];
+  itoa(index, dCt, 10);
+  strcat(dataString, dCt);
+  strcat(dataString, ":");
+  strcat(dataString, "RA01;UTC=");
   timeToString(dataString, data.hour[index], data.minute[index], data.second[index]);
   // Add pressure to string
-  strcat(dataString, ",PA=");
-  char pressureTmp[8];
-  pressureToString(pressureTmp, data.pressure[index]);
+  strcat(dataString, ";kpa=");
+  char pressureTmp[6];
+  pressureToString(pressureTmp, index);
   strcat(dataString, pressureTmp);
 }
 

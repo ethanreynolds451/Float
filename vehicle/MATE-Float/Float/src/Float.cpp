@@ -18,7 +18,8 @@ void Float::begin(int baud){
 }
 
 // Main function to read and execute commands
-void Float::update(){ 
+void Float::update(){
+  adjustSpeed();
   checkLimits();
   if(everyFive()){
     // Start off by broadcasting company data every five seconds
@@ -28,6 +29,14 @@ void Float::update(){
     // When doing vertical profile, capture data every five seconds
     if(flag.verticalProfile){
       recordData();
+      if(readPressure() >= float(kpa_to_m*(float(profileDepth - profileBuffer)))){
+        flag.reachedBottom = true;
+      }
+      // If it has reached the surface, stop recording data and request transmission
+      if(flag.reachedBottom&&(readPressure() <= float(kpa_to_m*profileBuffer))){
+        flag.verticalProfile = false;
+        flag.requestTransmission = true;
+      }
     }
     // When vertical profile is completed, send data transmission request every five seconds
     if(flag.requestTransmission){
@@ -44,30 +53,15 @@ void Float::update(){
   }
   // Vertical profile operations
   if(flag.verticalProfile){
-    // If it has reached the bottom, start going up
-    if(readPressure() >= (9780*(float(profileDepth - profileBuffer)))){
-      flag.reachedBottom = true;
-    }
-    // If it has reached the surface, stop recording data and request transmission
-    if(flag.reachedBottom&&(readPressure() <= (9780*(float(profileBuffer))))){
-      flag.reachedSurface = true;
-    }
     // While decending, fill ballast until it is full
     if((! flag.reachedBottom)&&(! limitFull())){
       motion = 0;
     // While ascending, empty ballast until empty
     } else if ((flag.reachedBottom)&&(! limitEmpty())){
       motion = 2;
-    // They can never happen at the same time
-    // Float is always filling or emptying until the limit is reached
-    // When the limit is reached, it stops until state of reachedBottom changes
+    // Otherwise, remain stopped
     } else {
       motion = 1;
-    }
-    // Exit loop when float has reached the surface
-    if(flag.reachedSurface == true){
-      flag.verticalProfile = false;
-      flag.requestTransmission = true;
     }
   }
   if(flag.fillEmpty){
@@ -148,21 +142,21 @@ bool Float::limitFull(){
 // *** Motion Control  *** //
 
 // Empty ballast
-void Float::empty(int speed){
+void Float::empty(){
   digitalWrite(enablePin, HIGH);
   digitalWrite(directionPin, LOW);
   stepper.play(speed*speedFactor);
 }
 
 // Fill ballast
-void Float::fill(int speed){
+void Float::fill(){
   digitalWrite(enablePin, HIGH);
   digitalWrite(directionPin, HIGH);
   stepper.play(speed*speedFactor);
 }
 
 // Takes direction as input parameter
-void Float::move(int speed, int direction){
+void Float::move(int direction){
   digitalWrite(enablePin, HIGH);
   if(direction == -1){
     digitalWrite(directionPin, HIGH);
@@ -191,10 +185,19 @@ void Float::resetSampleData(){
 // *** Real Data Management *** //
 
 void Float::recordData(){
-  data.hour[dataCount] = RTC.getHours() + timeZoneOffset;
-  data.minute[dataCount] = RTC.getMinutes();
-  data.second[dataCount] = RTC.getSeconds();
-  data.pressure[dataCount] = readPressure();
+  if(RTC.isRunnint()){
+    data.hour[dataCount] = static_cast<uint8_t>RTC.getHours() + timeZoneOffset;
+    data.minute[dataCount] = static_cast<uint8_t>RTC.getMinutes();
+    data.second[dataCount] = static_cast<uint8_t>RTC.getSeconds();
+  } else {
+    data.hour[dataCount] = 62;
+    data.minute[dataCount] = 62;
+    data.second[dataCount] = 62;
+  }
+  float pressure = readPressure();
+  data.pressure_int[dataCount] = int(pressure);
+  data.pressure_decimal[dataCount] = static_cast<int>((pressure - static_cast<int>(pressure)) * 10);
+  data.recieved = 0;
   dataCount++;
 }
 
@@ -215,8 +218,8 @@ void Float::setTimeZone(int zone){
 // *** Composite Functions *** //
 
 
-void Float::sendData(){
-  
+void Float::sendData(char* values){
+
 }
 
 // *** Internal Functions *** //
@@ -250,6 +253,13 @@ bool Float::checkLimits(){
   return false;
 }
 
+void Float::adjustSpeed(){
+    if (analogRead(speedControlPin) > 10){
+        speed = map(analogRead(speedControlPin), 0, 1023, 0, 100);
+    } else {
+        speed = default_speed;
+    }
 
+}
  
  

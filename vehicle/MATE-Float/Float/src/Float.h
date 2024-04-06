@@ -15,16 +15,17 @@ class Float {
     bool checkLimits();
     bool limitEmpty();
     bool limitFull();
-    void empty(int speed = 40);
-    void fill(int speed = 40);
-    void move(int direction, int speed);
+    void empty();
+    void fill();
+    void move(int direction);
     void stop();
     void resetSampleData();
     void recordData();
     void setTimeZone(int zone);
     bool setStartCommand(char* command);
-    void sendData();
+    void sendData(char* values);
     bool checkInputs();
+    void adjustSpeed();
 };
 
 #endif
