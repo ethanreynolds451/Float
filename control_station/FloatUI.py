@@ -193,7 +193,7 @@ class FloatUI(tk.Tk):
     def send(self, data):
         try:
             self.ser.write("AT+SEND=".encode())
-            self.ser.write(self.address.get().encode())
+            self.ser.write(self.selected_address.get().encode())
             self.ser.write(",".encode())
             self.ser.write(str(len(data)).encode())
             self.ser.write(",".encode())
