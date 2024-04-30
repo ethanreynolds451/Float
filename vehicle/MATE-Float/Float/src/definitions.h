@@ -16,13 +16,13 @@ Tone stepper;                     // Create tone instance for stepper control
 // User Defined Variables
 int timeZoneOffset = +5;                                  // Time to be used for time zone correction
 const int pressureRange[2] = {96, 921};                   // Analog read range for pressure sensor
-float profileDepth = 2;                                   // Depth of pool in m
+float profileDepth = 1;                                   // Depth of pool in m
 float profileBuffer = 0.25;                               // Window in which float will change direction
 float kpa_to_m = 9.78;
 const int dataLength = 64;                                // Define length of data packet
 const char companyData[dataLength] = "Hello World";       // Data that will be broadcasted before vertical profile
-const int speedFactor = 100;
-const int default_speed = 50;
+//const int speedFactor = 100;
+const int default_speed = 200;
 const int dataLimit = 50;                                 /* Maximum quantity of data values to be recorded on vertical profile
                                                              All data storage space is allocated at compilation
                                                              Adjust this value to fit Arduino memory
@@ -41,7 +41,6 @@ class Flag {
         bool emptied = false;
         bool reachedBottom = false;         // Start going up when float reaches bottom
 };
-
 Flag flag;      // Create instance of flag class
 
 byte motion = 1;
@@ -68,12 +67,12 @@ char dataString[dataLength] = "";         // Create string to hold data
 const int dataInLen = 64;                 // Length of buffer to hold incoming transmissions
 char dataIn[dataInLen];                   // Buffer to hold incomming transmissions
 struct dataArray {                        // Allocate storage for recording data
-  uint8_t hour[dataLimit] : 6;
-  uint8_t minute[dataLimit] : 6;
-  uint8_t second[dataLimit] : 6;
-  uint8_t pressure_int[dataLimit] : 8;
-  uint8_t pressure_decimal[dataLimit] : 4;
-  uint8_t recieved[dataLimit] : 2;
+  uint8_t hour[dataLimit];  //: 6
+  uint8_t minute[dataLimit];  //: 6
+  uint8_t second[dataLimit];  //: 6
+  uint8_t pressure_int[dataLimit];  //: 8
+  uint8_t pressure_decimal[dataLimit]; //: 4
+  uint8_t recieved[dataLimit];  //: 2
 };
 dataArray data;                            // Create instance of dataArray named 'data'
 byte failedSendAttempts = 0;
@@ -189,7 +188,7 @@ void pressureToString(char* result, int index) {
 
 void getDataString(int index) {
   clear(dataString, dataLength);
-  strcat(dataString, "DATA-);
+  strcat(dataString, "DATA-");
   char dCt[3];
   itoa(index, dCt, 10);
   strcat(dataString, dCt);
@@ -209,7 +208,7 @@ void getSampleData(){
     data.hour[i] = 88;
     data.minute[i] = 88;
     data.second[i] = 88;
-    data.pressure[i] = sampleDataCounter + 1;
+    data.pressure_int[i] = sampleDataCounter + 1;
   }
   sampleDataCounter++;
 }

@@ -11,17 +11,19 @@ Float::Float(int TX, int RX){
 }
 
 void Float::begin(int baud){
+  //Serial.begin(9600);
   radio.begin(baud);
   stepper.begin(speedPin);
   RTC.begin();
   initiatePins();
 }
 
-// Main function to read and execute commands
+// Main function to read and execute commxands
 void Float::update(){
   adjustSpeed();
   checkLimits();
   if(everyFive()){
+    //Serial.println(speed);
     // Start off by broadcasting company data every five seconds
     if(flag.broadcast){
       broadcastCompanyData();
@@ -145,14 +147,14 @@ bool Float::limitFull(){
 void Float::empty(){
   digitalWrite(enablePin, HIGH);
   digitalWrite(directionPin, LOW);
-  stepper.play(speed*speedFactor);
+  stepper.play(speed);
 }
 
 // Fill ballast
 void Float::fill(){
   digitalWrite(enablePin, HIGH);
   digitalWrite(directionPin, HIGH);
-  stepper.play(speed*speedFactor);
+  stepper.play(speed);
 }
 
 // Takes direction as input parameter
@@ -165,7 +167,7 @@ void Float::move(int direction){
   } else {
     return;
   }
-  stepper.play(speed*speedFactor);
+  stepper.play(speed);
 }
 
 void Float::stop(){
@@ -185,10 +187,10 @@ void Float::resetSampleData(){
 // *** Real Data Management *** //
 
 void Float::recordData(){
-  if(RTC.isRunnint()){
-    data.hour[dataCount] = static_cast<uint8_t>RTC.getHours() + timeZoneOffset;
-    data.minute[dataCount] = static_cast<uint8_t>RTC.getMinutes();
-    data.second[dataCount] = static_cast<uint8_t>RTC.getSeconds();
+  if(RTC.isRunning()){
+    data.hour[dataCount] = static_cast<uint8_t>(RTC.getHours() + timeZoneOffset);
+    data.minute[dataCount] = static_cast<uint8_t>(RTC.getMinutes());
+    data.second[dataCount] = static_cast<uint8_t>(RTC.getSeconds());
   } else {
     data.hour[dataCount] = 62;
     data.minute[dataCount] = 62;
@@ -197,7 +199,7 @@ void Float::recordData(){
   float pressure = readPressure();
   data.pressure_int[dataCount] = int(pressure);
   data.pressure_decimal[dataCount] = static_cast<int>((pressure - static_cast<int>(pressure)) * 10);
-  data.recieved = 0;
+  data.recieved[dataCount] = 0;
   dataCount++;
 }
 
@@ -255,11 +257,10 @@ bool Float::checkLimits(){
 
 void Float::adjustSpeed(){
     if (analogRead(speedControlPin) > 10){
-        speed = map(analogRead(speedControlPin), 0, 1023, 0, 100);
+        speed = map(analogRead(speedControlPin), 0, 1023, 0, 500);
     } else {
         speed = default_speed;
     }
-
 }
  
  

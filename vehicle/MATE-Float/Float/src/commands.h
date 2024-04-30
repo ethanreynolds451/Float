@@ -23,7 +23,7 @@ class commands {
       {5, "GTTIME", 0},
       {6, "GTPRSS", 0},
       {7, "GTDTCT", 0},
-      {8, "GTDATA", 0},
+      {8, "", 0},
       {10, "CONFRM", 0},
       {11, "GTRESP", 0},
       {12, "BRDCST", 0},
