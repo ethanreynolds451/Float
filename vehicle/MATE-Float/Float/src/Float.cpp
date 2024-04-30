@@ -11,16 +11,17 @@ Float::Float(int TX, int RX){
 }
 
 void Float::begin(int baud){
-  //Serial.begin(9600);
-  radio.begin(baud);
-  stepper.begin(speedPin);
-  RTC.begin();
+  // Serial.begin(9600);
   initiatePins();
+  radio.begin(baud);
+  // stepper.begin(speedPin);
+  RTC.begin();
+
 }
 
 // Main function to read and execute commxands
 void Float::update(){
-  adjustSpeed();
+  // adjustSpeed();
   checkLimits();
   if(everyFive()){
     //Serial.println(speed);
@@ -145,36 +146,41 @@ bool Float::limitFull(){
 
 // Empty ballast
 void Float::empty(){
-  digitalWrite(enablePin, HIGH);
-  digitalWrite(directionPin, LOW);
-  stepper.play(speed);
+  // digitalWrite(enablePin, HIGH);
+  // digitalWrite(directionPin, LOW);
+  // stepper.play(speed);
+  servo.writeMicroseconds(2500);
 }
 
 // Fill ballast
 void Float::fill(){
-  digitalWrite(enablePin, HIGH);
-  digitalWrite(directionPin, HIGH);
-  stepper.play(speed);
+  // digitalWrite(enablePin, HIGH);
+  // digitalWrite(directionPin, HIGH);
+  // stepper.play(speed);
+  servo.writeMicroseconds(500);
 }
 
 // Takes direction as input parameter
 void Float::move(int direction){
-  digitalWrite(enablePin, HIGH);
+  // digitalWrite(enablePin, HIGH);
   if(direction == -1){
-    digitalWrite(directionPin, HIGH);
+    empty();
+    // digitalWrite(directionPin, HIGH);
   } else if (direction == 1){
-    digitalWrite(directionPin, LOW);
+    fill();
+    // digitalWrite(directionPin, LOW);
   } else {
     return;
   }
-  stepper.play(speed);
+  // stepper.play(speed);
 }
 
 void Float::stop(){
-  stepper.stop();
-  digitalWrite(enablePin, LOW);
-  digitalWrite(speedPin, LOW);
-  digitalWrite(directionPin, LOW);
+  // stepper.stop();
+  // digitalWrite(enablePin, LOW);
+  // digitalWrite(speedPin, LOW);
+  // digitalWrite(directionPin, LOW);
+  servo.writeMicroseconds(1500);
 }
 
 // *** Sample Data Management *** //
@@ -255,12 +261,12 @@ bool Float::checkLimits(){
   return false;
 }
 
-void Float::adjustSpeed(){
-    if (analogRead(speedControlPin) > 10){
-        speed = map(analogRead(speedControlPin), 0, 1023, 0, 500);
-    } else {
-        speed = default_speed;
-    }
-}
+// void Float::adjustSpeed(){
+//     if (analogRead(speedControlPin) > 10){
+//         speed = map(analogRead(speedControlPin), 0, 1023, 0, 500);
+//     } else {
+//         speed = default_speed;
+//     }
+// }
  
  

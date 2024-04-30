@@ -5,13 +5,15 @@ void(* resetFunc) (void) = 0;
 
 // Includes
 #include <I2C_RTC.h>
-#include <Tone.h>
+// #include <Tone.h>
 #include <REYAX.h>
+#include <Servo.h>
 
 // Object definitions
 REYAX radio;                      // Create REYAX object
 PCF8523 RTC;                      // Creates instance of RTC
-Tone stepper;                     // Create tone instance for stepper control    
+// Tone stepper;                     // Create tone instance for stepper control
+Servo servo;
 
 // User Defined Variables
 int timeZoneOffset = +5;                                  // Time to be used for time zone correction
@@ -21,12 +23,13 @@ float profileBuffer = 0.25;                               // Window in which flo
 float kpa_to_m = 9.78;
 const int dataLength = 64;                                // Define length of data packet
 const char companyData[dataLength] = "Hello World";       // Data that will be broadcasted before vertical profile
-//const int speedFactor = 100;
-const int default_speed = 200;
-const int dataLimit = 50;                                 /* Maximum quantity of data values to be recorded on vertical profile
+// const int speedFactor = 100;
+// const int default_speed = 200;
+const int dataLimit = 60;                                 /* Maximum quantity of data values to be recorded on vertical profile
                                                              All data storage space is allocated at compilation
                                                              Adjust this value to fit Arduino memory
                                                           */
+// Up to five minutes of data
 
 class Flag {
     public:
@@ -44,7 +47,7 @@ class Flag {
 Flag flag;      // Create instance of flag class
 
 byte motion = 1;
-int speed = default_speed;
+// int speed = default_speed;
 
 byte dataSendDelay = 100;           // How many milliseconds to wait between data packet transmission
 
@@ -56,9 +59,10 @@ const byte limitFullPin = 5;
 const byte controlEmptyPin = 6;
 const byte controlStopPin = 7;
 const byte controlFillPin = 8;
-const byte directionPin = 10;
-const byte speedPin = 11;
-const byte enablePin = 12;
+const byte servoPin = 9;
+// const byte directionPin = 10;
+// const byte speedPin = 11;
+// const byte enablePin = 12;
 const byte pressurePin = A0;
 const byte speedControlPin = A2;
 
@@ -93,8 +97,9 @@ void initiatePins() {
   pinMode(controlEmptyPin, INPUT_PULLUP);
   pinMode(controlFillPin, INPUT_PULLUP);
   pinMode(controlStopPin, INPUT_PULLUP);
-  pinMode(directionPin, OUTPUT);
-  pinMode(enablePin, OUTPUT);
+  servo.attach(servoPin);
+  // pinMode(directionPin, OUTPUT);
+  // pinMode(enablePin, OUTPUT);
 }
 
 void broadcastCompanyData() {
