@@ -92,6 +92,7 @@ void Float::update(){
     checkInputs();      // This is for manual hardware control
   }
   if(timeUnder > maxTimeUnder){
+    radio.send("Resurface Failsafe Activated"); //For debug
     timeUnder = 0;
     c.stopFunctions();
     motion = 2;
