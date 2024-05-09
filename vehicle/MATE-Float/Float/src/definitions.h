@@ -17,6 +17,7 @@ Servo servo;
 
 // User Defined Variables
 int timeZoneOffset = +5;                                  // Time to be used for time zone correction
+const int maxTimeUnder = 180;
 const int pressureRange[2] = {96, 921};                   // Analog read range for pressure sensor
 float profileDepth = 1;                                   // Depth of pool in m
 float profileBuffer = 0.25;                               // Window in which float will change direction
@@ -47,6 +48,7 @@ class Flag {
 Flag flag;      // Create instance of flag class
 
 byte motion = 1;
+int timeUnder = 0;
 // int speed = default_speed;
 
 byte dataSendDelay = 100;           // How many milliseconds to wait between data packet transmission

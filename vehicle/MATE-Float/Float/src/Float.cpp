@@ -45,6 +45,9 @@ void Float::update(){
     if(flag.requestTransmission){
       requestTransmitData();
     }
+    if(readPressure() >= profileBuffer){
+        timeUnder += 5;
+    }
   }
   if(readCommand()){
     if(! c.overrideRequired(activeCommand)){
@@ -87,6 +90,11 @@ void Float::update(){
   }
   if(flag.manualControl){
     checkInputs();      // This is for manual hardware control
+  }
+  if(timeUnder > maxTimeUnder){
+    timeUnder = 0;
+    c.stopFunctions();
+    motion = 2;
   }
   if(motion == 1){
     stop();
