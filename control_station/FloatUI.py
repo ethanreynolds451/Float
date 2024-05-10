@@ -239,7 +239,7 @@ class FloatUI(tk.Tk):
             self.console_println("Send sucessful")
         if "+RCV" in data:
             message = self.parse_message(data)
-            self.console_println(message)
+            self.com_println(message)
             if self.recording:
                 self.record(message)
     # </editor-fold>
