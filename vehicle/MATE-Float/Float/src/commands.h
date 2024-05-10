@@ -117,7 +117,7 @@ class commands {
 
        float pressure = readPressure();
 
-       Serial.println(pressure);
+       //Serial.println(pressure);
 
        data.pressure_decimal[dataCount] = static_cast<int>((pressure - static_cast<int>(pressure)) * 10);
 

@@ -19,14 +19,14 @@ Servo servo;
 int timeZoneOffset = +5;                                  // Time to be used for time zone correction
 const int maxTimeUnder = 180;
 const int pressureRange[2] = {96, 921};                   // Analog read range for pressure sensor
-float profileDepth = 1;                                   // Depth of pool in m
-float profileBuffer = 0.25;                               // Window in which float will change direction
+float profileDepth = 2;                                   // Depth of pool in m
+float profileBuffer = 0.5;                               // Window in which float will change direction
 float kpa_to_m = 9.78;
 const int dataLength = 64;                                // Define length of data packet
-const char companyData[dataLength] = "Hello World";       // Data that will be broadcasted before vertical profile
+const char companyData[dataLength] = "RA06";       // Data that will be broadcasted before vertical profile
 // const int speedFactor = 100;
 // const int default_speed = 200;
-const int dataLimit = 60;                                 /* Maximum quantity of data values to be recorded on vertical profile
+const int dataLimit = 30;                                 /* Maximum quantity of data values to be recorded on vertical profile
                                                              All data storage space is allocated at compilation
                                                              Adjust this value to fit Arduino memory
                                                           */
@@ -131,7 +131,7 @@ float readPressure() {
   */
   //return map(analogRead(pressurePin), pressureRange[0], pressureRange[1], 0, 100);
   // Round it to one decimal place
-  return float(round(float(0.689476 * map(analogRead(pressurePin), pressureRange[0], pressureRange[1], 0, 1000))*10)/10); // 1 psi = 6894.76 pa
+  return float(round(float(0.689476 * map(analogRead(pressurePin), pressureRange[0], pressureRange[1], 0, 1000))*10))/10; // 1 psi = 6894.76 pa
 }
 
 unsigned long fiveSecondCounter = 0;
