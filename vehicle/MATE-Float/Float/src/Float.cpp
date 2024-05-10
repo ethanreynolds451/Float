@@ -11,7 +11,7 @@ Float::Float(int TX, int RX){
 }
 
 void Float::begin(int baud){
-  // Serial.begin(9600);
+   Serial.begin(9600);
   initiatePins();
   radio.begin(baud);
   // stepper.begin(speedPin);
@@ -46,7 +46,7 @@ void Float::update(){
       requestTransmitData();
     }
     if(readPressure() >= profileBuffer){
-        timeUnder += 5;
+        timeUnder = timeUnder + 5;
     }
   }
   if(readCommand()){
@@ -211,7 +211,9 @@ void Float::recordData(){
     data.minute[dataCount] = 62;
     data.second[dataCount] = 62;
   }
+
   float pressure = readPressure();
+
   data.pressure_int[dataCount] = int(pressure);
   data.pressure_decimal[dataCount] = static_cast<int>((pressure - static_cast<int>(pressure)) * 10);
   data.recieved[dataCount] = 0;

@@ -110,10 +110,28 @@ class commands {
       radio.dataSend();
     }
     void sendPressure(){
-      clear(dataString, dataLength);
-      pressureToString(dataString, readPressure());
-      radio.dataAdd("kpa=");
-      radio.dataAdd(dataString);
+      // clear(dataString, dataLength);
+      // pressureToString(dataString, readPressure());
+      // radio.dataAdd("kpa=");
+      // radio.dataAdd(dataString);
+
+       float pressure = readPressure();
+
+       Serial.println(pressure);
+
+       data.pressure_decimal[dataCount] = static_cast<int>((pressure - static_cast<int>(pressure)) * 10);
+
+       char pCh[4];              // Allocate enough space to hold largest possible
+
+       itoa(int(pressure), pCh, 10);
+       //dtostrf(pr, 3, 1, pCh);
+       radio.dataAdd(pCh);
+
+       radio.dataAdd(".");
+
+       itoa(static_cast<int>((pressure - static_cast<int>(pressure)) * 10), pCh, 10);
+       radio.dataAdd(pCh);
+
       radio.dataSend();
     }
     
