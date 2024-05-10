@@ -11,6 +11,7 @@ Float::Float(int TX, int RX){
 }
 
 void Float::begin(int baud){
+  //Serial.begin(9600);
   initiatePins();
   radio.begin(baud);
   // stepper.begin(speedPin);
