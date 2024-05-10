@@ -104,18 +104,6 @@ void initiatePins() {
   // pinMode(enablePin, OUTPUT);
 }
 
-void broadcastCompanyData() {
-  radio.dataAdd(companyData);
-  radio.dataAdd(": Seconds = ");
-  if (RTC.isRunning()) {
-    char t[3];
-    itoa(RTC.getSeconds(), t, 10);
-    radio.dataAdd(t);
-  }
-  radio.dataSend();
-  radio.waitSent();
-}
-
 void requestTransmitData() {
   radio.dataAdd("RQTX=");
   char dc[4];
@@ -181,7 +169,6 @@ void timeToString(char* result, int hr, int mn, int sc) {
   }
   itoa(sc, tmp, 10);
   strcat(result, tmp);
-  strcat(result, ":");
 }
 
 void pressureToString(char* result, int index) {
@@ -218,6 +205,40 @@ void getSampleData(){
     data.pressure_int[i] = sampleDataCounter + 1;
   }
   sampleDataCounter++;
+}
+
+void broadcastCompanyData() {
+  radio.dataAdd(companyData);
+  radio.dataAdd("; ");
+
+  if (RTC.isRunning()) {
+    char time[9];
+    timeToString(time, RTC.getHours(), RTC.getMinutes(), RTC.getSeconds());
+    radio.dataAdd(time);
+  } else {
+    radio.dataAdd("TimeError");
+  }
+  radio.dataAdd(" UTC; ");
+
+ float pressure = readPressure();
+    char pCh[4];              // Allocate enough space to hold largest possible
+    itoa(int(pressure), pCh, 10);
+    radio.dataAdd(pCh);
+    radio.dataAdd(".");
+    itoa(static_cast<int>((pressure - static_cast<int>(pressure)) * 10), pCh, 10);
+    radio.dataAdd(pCh);
+  radio.dataAdd(" kpa; ");
+
+  float depth = float(pressure/kpa_to_m);
+  char dCh[4];
+  itoa(int(depth), dCh, 10);
+  radio.dataAdd(".");
+  itoa(static_cast<int>((pressure - static_cast<int>(pressure)) * 10), dCh, 10);
+  radio.dataAdd(pCh);
+  radio.dataAdd(" meters");
+
+  radio.dataSend();
+  radio.waitSent();
 }
 
 #endif
