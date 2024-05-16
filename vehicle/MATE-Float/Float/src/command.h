@@ -5,6 +5,19 @@
 
 // This creates a set of functions related to the execution of commands
 
+
+// Command processing
+byte activeCommand = 0;           // Stores most recent recieved command
+byte savedCommand = 0;            // Save a command for later execution, used when verification is needed
+
+void requestTransmitData() {
+  radio.dataAdd("RQTX=");
+  char dc[4];
+  itoa(dataCount, dc, 10);
+  radio.dataAdd(dc);
+  radio.dataSend();
+}
+
 class commands {
   private: 
     struct floatCommands {

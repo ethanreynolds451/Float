@@ -1,60 +1,39 @@
 #ifndef DEFINITIONS_h
 #define DEFINITIONS_h
 
-void(* resetFunc) (void) = 0;
+void(* resetFunc) (void) = 0;     // Define system reset function
 
 // Includes
 #include <I2C_RTC.h>
-// #include <Tone.h>
 #include <REYAX.h>
 #include <Servo.h>
 
 // Object definitions
 REYAX radio;                      // Create REYAX object
-PCF8523 RTC;                      // Creates instance of RTC
-// Tone stepper;                     // Create tone instance for stepper control
-Servo servo;
+PCF8523 RTC;                      // Create instance of RTC
+Servo servo;                      // Create instance of Servo
 
-// User Defined Variables
-int timeZoneOffset = +5;                                  // Time to be used for time zone correction
-const int maxTimeUnder = 180;
-const int pressureRange[2] = {98, 921};                   // Analog read range for pressure sensor
-//float depthCalibrationOffset = 0;
-float profileDepth = 3;                                   // Depth of pool in m
-float profileBuffer = 0.5;                               // Window in which float will change direction
-float kpa_to_m = 9.792;
-const int dataLength = 64;                                // Define length of data packet
-const char companyData[dataLength] = "RA06";       // Data that will be broadcasted before vertical profile
-// const int speedFactor = 100;
-// const int default_speed = 200;
+// *** User-Defined Variables ***
+
+int timeZoneOffset = +5;                                 // Time to be used for time zone correction
+const int maxTimeUnder = 180;                            // Maximum time float will remain below surface before acivating failsafe
+const int pressureRange[2] = {98, 921};                  // Calibrate analog read range for pressure sensor
+const float profileDepth = 3;                            // Depth of profile in meters
+const float profileBuffer = 0.5;                         // Window in which float will change direction
+const int dataLength = 64;                               // Define length of data packet
+const char companyData[dataLength] = "RA06";             // Data that will be broadcasted before vertical profile
 const int dataLimit = 30;                                 /* Maximum quantity of data values to be recorded on vertical profile
                                                              All data storage space is allocated at compilation
                                                              Adjust this value to fit Arduino memory
                                                           */
-// Up to five minutes of data
 
-class Flag {;
-    public:
-        bool manualControl = true;          // Allow manual control until first transmission is recieved
-        bool requestTransmission = false;   // When data is recorded and waiting to transmit
-        bool broadcast = true;              // Start off broadcasting every 5 minutes
-        bool verticalProfile = false;       // Execute vertical profile functions
-        bool goToCenter = false;            // Empty float then move to center position
-        bool fillEmpty = false;             // Fill then empty ballast tank
-        // INDICATOR variables
-        bool filled = false;
-        bool emptied = false;
-        bool reachedBottom = false;         // Start going up when float reaches bottom
-};
-Flag flag;      // Create instance of flag class
-
-byte motion = 1;
-int timeUnder = 0;
-// int speed = default_speed;
-
+const float kpa_to_m = 9.792;                            // Convert kpa to meters fresh water
 byte dataSendDelay = 100;           // How many milliseconds to wait between data packet transmission
 
-// Pin Definitions
+
+
+// *** Pin Definitions ***
+
 const byte defaultTX = 2;
 const byte defaultRX = 3;
 const byte limitEmptyPin = 4;
@@ -63,65 +42,13 @@ const byte controlEmptyPin = 6;
 const byte controlStopPin = 7;
 const byte controlFillPin = 8;
 const byte servoPin = 9;
-// const byte directionPin = 10;
-// const byte speedPin = 11;
-// const byte enablePin = 12;
 const byte pressurePin = A0;
 const byte speedControlPin = A2;
 
-// Communication and data management
-char dataString[dataLength] = "";         // Create string to hold data
-const int dataInLen = 64;                 // Length of buffer to hold incoming transmissions
-char dataIn[dataInLen];                   // Buffer to hold incomming transmissions
-struct dataArray {                        // Allocate storage for recording data
-  uint8_t hour[dataLimit];  //: 6
-  uint8_t minute[dataLimit];  //: 6
-  uint8_t second[dataLimit];  //: 6
-  uint8_t pressure_int[dataLimit];  //: 8
-  uint8_t pressure_decimal[dataLimit]; //: 4
-  uint8_t recieved[dataLimit];  //: 2
-};
-dataArray data;                            // Create instance of dataArray named 'data'
-byte failedSendAttempts = 0;
 
-// Command processing
-byte activeCommand = 0;           // Stores most recent recieved command
-byte savedCommand = 0;            // Save a command for later execution, used when verification is needed
 
-// Data Transmission  
-int dataCount = 0;                // Tracks the number of data packets recorded
-int sampleDataCounter = 0;        // Tracks the number of data packets recorded           
 
-// Functions
 
-void initiatePins() {
-  pinMode(limitEmptyPin, INPUT_PULLUP);
-  pinMode(limitFullPin, INPUT_PULLUP);
-  pinMode(controlEmptyPin, INPUT_PULLUP);
-  pinMode(controlFillPin, INPUT_PULLUP);
-  pinMode(controlStopPin, INPUT_PULLUP);
-  servo.attach(servoPin);
-  // pinMode(directionPin, OUTPUT);
-  // pinMode(enablePin, OUTPUT);
-}
-
-void requestTransmitData() {
-  radio.dataAdd("RQTX=");
-  char dc[4];
-  itoa(dataCount, dc, 10);
-  radio.dataAdd(dc);
-  radio.dataSend();
-}
-
-float readPressure() {
-  /* Sensor returns linear 0.5 to 4.5 V, 0 to 100 PSI
-     Maps input values from lower / upper analog read limit to scale of 1000, which will equal tenths of PSI
-     Multiplies by 689.5 to convert to PA
-  */
-  //return map(analogRead(pressurePin), pressureRange[0], pressureRange[1], 0, 100);
-  // Round it to one decimal place
-  return float(round(float(0.689476 * map(analogRead(pressurePin), pressureRange[0], pressureRange[1], 0, 1000))*10))/10; // 1 psi = 6894.76 pa
-}
 
 unsigned long fiveSecondCounter = 0;
 
