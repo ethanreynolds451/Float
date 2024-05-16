@@ -187,4 +187,42 @@ class commands {
 
 commands c;   // Create instance of commands class
 
+readCommand(){
+  if(radio.available() > 0){
+    //First, read the incomming data (automatically calls serialWait())
+    radio.readData(dataIn, 64);
+    // Debug, sends length of recieved data
+      //char tmp[3];
+      //itoa(strlen(dataIn), tmp, 10);
+      //radio.send(tmp);
+      //radio.waitSent();
+
+    //Decode the message and execute the command
+    for(int i = 0; i < c.commandLen; i++){  // For number of potential commands
+      if(strncmp(dataIn, c.command[i].code, strlen(dataIn)) == 0){  // If strings match
+        activeCommand = c.command[i].index;   // Set active command to current index
+        flag.broadcast = false; // Stop broadcasting
+        flag.manualControl = false; // Disable manual control
+      // char tmp[3];
+      // itoa(activeCommand, tmp, 10);
+      // radio.send(tmp);
+      // radio.waitSent();
+        //Send a confirmation message that the data was recieved and wait for it to send
+        radio.dataAdd("Executing ");
+        radio.dataAdd(dataIn);
+        radio.dataSend();
+        radio.waitSent();
+        return true;
+      }
+    }
+    radio.send("Command not Recognized");
+    radio.waitSent();
+  }
+  return false;
+}
+
+void Float::setTimeZone(int zone){
+  timeZoneOffset = zone;
+}
+
 #endif

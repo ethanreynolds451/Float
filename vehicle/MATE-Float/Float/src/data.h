@@ -118,4 +118,31 @@ void broadcastCompanyData() {
   radio.waitSent();
 }
 
+void Float::resetSampleData(){
+  sampleDataCounter = 0;
+}
+
+void Float::recordData(){
+  if(RTC.isRunning()){
+    data.hour[dataCount] = static_cast<uint8_t>(RTC.getHours());
+    data.minute[dataCount] = static_cast<uint8_t>(RTC.getMinutes());
+    data.second[dataCount] = static_cast<uint8_t>(RTC.getSeconds());
+  } else {
+    data.hour[dataCount] = static_cast<uint8_t>(42);
+    data.minute[dataCount] = static_cast<uint8_t>(42);
+    data.second[dataCount] = static_cast<uint8_t>(42);
+  }
+
+  float pressure = readPressure();
+
+  data.pressure_int[dataCount] = static_cast<uint8_t>(int(pressure));
+  data.pressure_decimal[dataCount] = static_cast<uint8_t>((pressure - static_cast<int>(pressure)) * 10);
+  data.recieved[dataCount] = static_cast<uint8_t>(0);
+  dataCount++;
+}
+
+void Float::sendData(char* values){
+
+}
+
 ##endif

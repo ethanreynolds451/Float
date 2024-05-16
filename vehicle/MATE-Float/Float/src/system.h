@@ -50,5 +50,6 @@ class System {
         }
 
 };
+System system;
 
 #endif
