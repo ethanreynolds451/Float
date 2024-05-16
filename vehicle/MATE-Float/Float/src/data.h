@@ -1,6 +1,7 @@
 #ifndef DATA_h
 #define DATA_h
 
+#include "definitions.h"
 
         struct dataArray {                        // Allocate storage for recording data
           uint8_t hour[dataLimit];  //: 6

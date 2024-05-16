@@ -2,8 +2,7 @@
 #define FLOAT_h
 
 #include "Arduino.h"
-#include "definitions.h"
-#include "commands.h"
+#include "libraries.h"
 
 class Float {
   public:

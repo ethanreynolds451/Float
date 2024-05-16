@@ -1,5 +1,5 @@
-#ifndef COMMANDS_h
-#define COMMANDS_h
+#ifndef COMMAND_h
+#define COMMAND_h
 
 #include "definitions.h"
 

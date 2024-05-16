@@ -1,6 +1,8 @@
 #ifndef SYSTEM_h
 #define SYSTEM_h
 
+#include "definitions.h"
+
 class System {
     public:
         byte motion = 1;

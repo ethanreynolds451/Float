@@ -1,7 +1,5 @@
 #include "Arduino.h"
 #include "Float.h"
-
-#include "commands.h"
 #include "definitions.h"
 
 // *** Initiation and Execution Functions *** //
