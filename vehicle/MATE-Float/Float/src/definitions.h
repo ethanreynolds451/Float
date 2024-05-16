@@ -30,18 +30,22 @@ const int dataLimit = 30;                                 /* Maximum quantity of
 const float kpa_to_m = 9.792;                            // Convert kpa to meters fresh water
 byte dataSendDelay = 100;           // How many milliseconds to wait between data packet transmission
 
+defaultBaudrate = 9600;
 
 // *** Pin Definitions ***
 
-const byte defaultTX = 2;
-const byte defaultRX = 3;
-const byte limitEmptyPin = 4;
-const byte limitFullPin = 5;
-const byte controlEmptyPin = 6;
-const byte controlStopPin = 7;
-const byte controlFillPin = 8;
-const byte servoPin = 9;
-const byte pressurePin = A0;
-const byte speedControlPin = A2;
+class Pin {
+    const byte defaultTX = 2;
+    const byte defaultRX = 3;
+    const byte limitEmpty = 4;
+    const byte limitFull = 5;
+    const byte controlEmpty = 6;
+    const byte controlStop = 7;
+    const byte controlFill = 8;
+    const byte servo = 9;
+    const byte pressure = A0;
+    const byte speedControl = A2;
+};
+Pin pin;
 
 #endif
