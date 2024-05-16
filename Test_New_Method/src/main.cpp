@@ -4,6 +4,6 @@ Vehicle::Vehicle(){
 
 }
 
-Vehicle::begin(){
-    system.start();
+void Vehicle::begin(){
+    sys.start();
 }

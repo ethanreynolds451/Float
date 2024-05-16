@@ -17,7 +17,6 @@ class System {
         }
         void update(){
             control.step();
-            if terminate
         }
         void terminate(){
             exit = true;
@@ -25,6 +24,6 @@ class System {
     private:
         bool exit = false;
 };
-System system;
+System sys;
 
 #endif
