@@ -12,6 +12,13 @@ class Communication {
         char dataString[dataLength] = "";         // Create string to hold data
         const int dataInLen = 64;                 // Length of buffer to hold incoming transmissions
         char dataIn[dataInLen];                   // Buffer to hold incomming transmissions
+
+
+        void clear(char* input, int len) {
+            for (int i = 0; i < len; i++) {
+                input[i] = '\0';
+            }
+        }
 };
 
 #endif

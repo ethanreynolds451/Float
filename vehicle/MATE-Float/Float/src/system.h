@@ -6,6 +6,8 @@ class System {
         byte motion = 1;
         int timeUnder = 0;
 
+        unsigned long fiveSecondCounter = 0;
+
         void initiatePins() {
           pinMode(limitEmptyPin, INPUT_PULLUP);
           pinMode(limitFullPin, INPUT_PULLUP);
@@ -29,6 +31,23 @@ class System {
                 bool reachedBottom = false;         // Start going up when float reaches bottom
         };
         Flag flag;      // Create instance of flag class
+
+        bool everyFive() {
+          // If the RTC is working, use the second counter to time actions at 5 second intervals
+          if (RTC.isRunning()) {
+            int s = RTC.getSeconds();
+            if (s % 5 == 0) {
+              return true;
+            }
+          } else {
+            // Adds backup method using Arduino clock if RTC failure
+            if (millis() - fiveSecondCounter >= 5000) {
+              fiveSecondCounter = millis();
+              return true;
+            }
+          }
+          return false;
+        }
 
 };
 
