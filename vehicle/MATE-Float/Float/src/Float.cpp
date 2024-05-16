@@ -206,20 +206,20 @@ void Float::resetSampleData(){
 
 void Float::recordData(){
   if(RTC.isRunning()){
-    data.hour[dataCount] = static_cast<uint8_t>(RTC.getHours() + timeZoneOffset);
+    data.hour[dataCount] = static_cast<uint8_t>(RTC.getHours());
     data.minute[dataCount] = static_cast<uint8_t>(RTC.getMinutes());
     data.second[dataCount] = static_cast<uint8_t>(RTC.getSeconds());
   } else {
-    data.hour[dataCount] = 62;
-    data.minute[dataCount] = 62;
-    data.second[dataCount] = 62;
+    data.hour[dataCount] = static_cast<uint8_t>(42);
+    data.minute[dataCount] = static_cast<uint8_t>(42);
+    data.second[dataCount] = static_cast<uint8_t>(42);
   }
 
   float pressure = readPressure();
 
-  data.pressure_int[dataCount] = int(pressure);
-  data.pressure_decimal[dataCount] = static_cast<int>((pressure - static_cast<int>(pressure)) * 10);
-  data.recieved[dataCount] = 0;
+  data.pressure_int[dataCount] = static_cast<uint8_t>(int(pressure));
+  data.pressure_decimal[dataCount] = static_cast<uint8_t>((pressure - static_cast<int>(pressure)) * 10);
+  data.recieved[dataCount] = static_cast<uint8_t>(0);
   dataCount++;
 }
 

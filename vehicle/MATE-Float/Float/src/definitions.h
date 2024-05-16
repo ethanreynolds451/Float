@@ -20,9 +20,9 @@ int timeZoneOffset = +5;                                  // Time to be used for
 const int maxTimeUnder = 180;
 const int pressureRange[2] = {98, 921};                   // Analog read range for pressure sensor
 //float depthCalibrationOffset = 0;
-float profileDepth = 2;                                   // Depth of pool in m
+float profileDepth = 3;                                   // Depth of pool in m
 float profileBuffer = 0.5;                               // Window in which float will change direction
-float kpa_to_m = 9.78;
+float kpa_to_m = 9.792;
 const int dataLength = 64;                                // Define length of data packet
 const char companyData[dataLength] = "RA06";       // Data that will be broadcasted before vertical profile
 // const int speedFactor = 100;
@@ -33,7 +33,7 @@ const int dataLimit = 30;                                 /* Maximum quantity of
                                                           */
 // Up to five minutes of data
 
-class Flag {
+class Flag {;
     public:
         bool manualControl = true;          // Allow manual control until first transmission is recieved
         bool requestTransmission = false;   // When data is recorded and waiting to transmit
@@ -235,7 +235,7 @@ void broadcastCompanyData() {
   itoa(int(depth), dCh, 10);
   radio.dataAdd(dCh);
   radio.dataAdd(".");
-  itoa(static_cast<int>((pressure - static_cast<int>(pressure)) * 10), dCh, 10);
+  itoa(static_cast<int>((depth - static_cast<int>(depth)) * 10), dCh, 10);
   radio.dataAdd(dCh);
   radio.dataAdd(" meters");
 
