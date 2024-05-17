@@ -1,10 +1,10 @@
-#ifndef SYSTEM_h
-#define SYSTEM_h
+#ifndef CORE_h
+#define CORE_h
 
 #include "definitions.h"
-#include "control.h"
+#include "packages/include.h"
 
-class System {
+class Core {
     public:
         void start(){
             control.begin();
@@ -24,6 +24,5 @@ class System {
     private:
         bool exit = false;
 };
-System sys;
 
 #endif

@@ -1,0 +1,30 @@
+
+ definitions                            // Hardware definitions and system-wide variables
+      |
+      |------|--------|-------|
+      |      |        |       |
+      |   control  sensors   etc.       // Individual packets for each task
+      |      |        |       |
+      |------|--------|-------|
+      |
+   include                              // Consolidates inclusion of previous packets
+      |
+     core                              // Manages flow of program
+      |
+    main.h  ------  main.cpp            // Gateway between sketch and system, defines interactions
+      |
+    sketch                              // Main Arduino code
+
+
+
+                |----------------------------------|
+                | -- sensors -- control -- etc. -- |
+                |----------------------------------|
+                                   |
+              include.h ------ packages
+                 |
+               core.h -------- definitions.h
+                 |
+ main.cpp ---  main.h
+                 |
+               sketch

@@ -1,8 +1,6 @@
 #ifndef CONTROL_h
 #define CONTROL_h
 
-#include "definitions.h"
-
 #include <Servo.h>
 Servo servo;
 
@@ -26,6 +24,5 @@ class Control {
         int pos = 0;
         byte dir = 1;
 };
-Control control;
 
 #endif
