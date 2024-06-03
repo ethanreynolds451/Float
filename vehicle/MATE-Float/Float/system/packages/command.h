@@ -1,7 +1,6 @@
 #ifndef COMMAND_h
 #define COMMAND_h
 
-#include "definitions.h"
 
 // This creates a set of functions related to the execution of commands
 

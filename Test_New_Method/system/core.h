@@ -2,7 +2,7 @@
 #define CORE_h
 
 #include "definitions.h"
-#include "packages/include.h"
+#include "packages/packages.h"
 
 class Core {
     public:

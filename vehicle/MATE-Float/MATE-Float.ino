@@ -1,5 +1,4 @@
-#include "Float/src/Float.h"
-#include "Float/src/Float.cpp"
+#include "Float.h"
 
 Float cajunInjector(2, 3);
 

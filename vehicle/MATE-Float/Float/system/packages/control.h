@@ -1,8 +1,6 @@
 #ifndef CONTROL_h
 #define CONTROL_h
 
-#include "definitions.h"
-
 // Empty ballast
 void Float::empty(){
   // digitalWrite(enablePin, HIGH);
