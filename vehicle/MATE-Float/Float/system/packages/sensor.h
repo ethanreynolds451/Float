@@ -3,23 +3,28 @@
 
 class limit {
     public:
-        int
-        bool limitEmpty(){
+        bool isLimitEmpty(){
+            emptyState = readEmpty;
+            return emptyState;
+        }
+        bool isLimitFull(){
+            fullState = readFull;
+            return fullState;
+        }
+    private:
+        bool readEmpty(){
             return ! digitalRead(pin.limitEmpty);
         }
-
-        bool limitFull(){
+        bool readFull(){
             return ! digitalRead(pin.limitFull);
         }
-
-    private:
-        bool limitEmpty = 0;
-        bool limitEmpty
+        bool emptyState = 0;
+        bool fullState = 0;
 
 };
 
 class pressure {
 
-}
+};
 
 #endif
