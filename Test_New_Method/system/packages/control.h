@@ -22,7 +22,7 @@ class Control {
         }
     private:
         int pos = 0;
-        byte dir = 1;
+        int dir = 1;
 };
 
 #endif

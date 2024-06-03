@@ -5,7 +5,7 @@
 
 class Pin {
     public:
-        byte servo = 9;
+        byte servo = 10;
 };
 Pin pin;
 
