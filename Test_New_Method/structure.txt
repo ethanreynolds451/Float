@@ -29,6 +29,21 @@
                  |
                sketch
 
+ FINAL
+
+                |----------------------------------|
+                | -- sensors -- control -- etc. -- |
+                |----------------------------------|
+                                   |
+              include.h ------ packages            // Include specific system components, can be subdivided
+                 |
+               core.h -------- definitions.h       // System-wide definitions, apply to packages
+                 |
+ main.cpp ---  main.h       // Does nothing but allow sketch to initiate system.
+     |-----------|          // Once system is initiated, sketch has no control until exit
+                 |
+ sketch ---- vehicle.h      // Single file to make including previous easier (optional)
+
 
 https://arduino.github.io/arduino-cli/0.30/library-specification/
 
