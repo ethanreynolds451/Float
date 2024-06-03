@@ -28,3 +28,8 @@
  main.cpp ---  main.h
                  |
                sketch
+
+
+https://arduino.github.io/arduino-cli/0.30/library-specification/
+
+ https://arduino.github.io/arduino-cli/0.35/sketch-build-process/#dependency-resolution
