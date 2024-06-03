@@ -8,10 +8,8 @@ class motor {
         initiate(byte s){
             servo.attach(s);
         }
-
     private:
-        Servo servo;
-
+        Servo servo;    // The Servo object can only be directly accessed in the class
 };
 
 #endif
