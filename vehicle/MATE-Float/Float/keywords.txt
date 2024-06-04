@@ -1,2 +1,0 @@
-Float			KEYWORD1
-begin			KEYWORD2
