@@ -1,9 +1,7 @@
 #ifndef MOTOR_H
 #define MOTOR_H
 
-#include "libraries/Servo-1.2.1/src/Servo.h"
-
-class motor {
+class Motor {
     public:
         initiate(byte& pin){
             servo.attach(pin);

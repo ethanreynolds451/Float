@@ -1,7 +1,7 @@
 #ifndef SENSOR_h
 #define SENSOR_h
 
-class limit {
+class Limit {
     public:
         void initiate(byte& bottom, byte& top){
             empty = bottom;
@@ -28,7 +28,7 @@ class limit {
         bool savedFullState = 0;
 };
 
-class pressure {
+class Pressure {
     public:
         void initiate(byte& p, int& lower, int& upper){
             pressurePin = p;
