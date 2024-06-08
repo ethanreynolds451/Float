@@ -1,140 +1,142 @@
 #ifndef DATA_h
 #define DATA_h
 
+Pressure pressure;
 
-        struct dataArray {                        // Allocate storage for recording data
-          uint8_t hour[dataLimit];  //: 6
-          uint8_t minute[dataLimit];  //: 6
-          uint8_t second[dataLimit];  //: 6
-          uint8_t pressure_int[dataLimit];  //: 8
-          uint8_t pressure_decimal[dataLimit]; //: 4
-          uint8_t recieved[dataLimit];  //: 2
-        };
+class Data {
+  public:
+    void requestTransmission() {
+      radio.dataAdd("RQTX=");
+      char dc[4];
+      itoa(dataCount, dc, 10);
+      radio.dataAdd(dc);
+      radio.dataSend();
+    }
+    void record(){
+      if(RTC.isRunning()){
+        db.hour[dataCount] = static_cast<uint8_t>(RTC.getHours());
+        db.minute[dataCount] = static_cast<uint8_t>(RTC.getMinutes());
+        db.second[dataCount] = static_cast<uint8_t>(RTC.getSeconds());
+      } else {
+        db.hour[dataCount] = static_cast<uint8_t>(42);
+        db.minute[dataCount] = static_cast<uint8_t>(42);
+        db.second[dataCount] = static_cast<uint8_t>(42);
+      }
+      float pressure = pressure.read();
+      db.pressure_int[dataCount] = static_cast<uint8_t>(int(pressure));
+      db.pressure_decimal[dataCount] = static_cast<uint8_t>((pressure - static_cast<int>(pressure)) * 10);
+      db.recieved[dataCount] = static_cast<uint8_t>(0);
+      dataCount++;
+    }
 
+    void transmit(char* values){
 
+    }
 
+    // Send data before profile
+    /*  This was made haistily last-minute so is
+    *  very ineficient and should be modified
+    */
+    void broadcastCompanyData() {
+      radio.dataAdd(companyData);
+      radio.dataAdd("; ");
+      if (RTC.isRunning()) {
+        char time[10] = "";
+        timeToString(time, RTC.getHours(), RTC.getMinutes(), RTC.getSeconds());
+        radio.dataAdd(time);
+      } else {
+        radio.dataAdd("TimeError");
+      }
+      radio.dataAdd(" UTC; ");
+      float pressure = pressure.read();
+      char pCh[4];              // Allocate enough space to hold largest possible
+      itoa(int(pressure), pCh, 10);
+      radio.dataAdd(pCh);
+      radio.dataAdd(".");
+      itoa(static_cast<int>((pressure - static_cast<int>(pressure)) * 10), pCh, 10);
+      radio.dataAdd(pCh);
+      radio.dataAdd(" kpa; ");
+      float depth = float(pressure/kpa_to_m);
+      char dCh[4];
+      itoa(int(depth), dCh, 10);
+      radio.dataAdd(dCh);
+      radio.dataAdd(".");
+      itoa(static_cast<int>((depth - static_cast<int>(depth)) * 10), dCh, 10);
+      radio.dataAdd(dCh);
+      radio.dataAdd(" meters");
+      radio.dataSend();
+      radio.waitSent();
+    }
 
+    void Float::setTimeZone(int zone){
+      timeZoneOffset = zone;
+    }
 
-void timeToString(char* result, int hr, int mn, int sc) {
-  // Add hour to string
-  if (hr < 10) {
-    strcat(result, "0");
-  }
-  char tmp[7];
-  itoa(hr, tmp, 10);
-  strcat(result, tmp);
-  strcat(result, ":");
-  // Add minute to string
-  if (mn < 10) {
-    strcat(result, "0");
-  }
-  itoa(mn, tmp, 10);
-  strcat(result, tmp);
-  strcat(result, ":");
-  // Add second to string
-  if (sc < 10) {
-    strcat(result, "0");
-  }
-  itoa(sc, tmp, 10);
-  strcat(result, tmp);
-}
+  private:
+    struct dataArray {                        // Allocate storage for recording data
+      uint8_t hour[dataLimit];  //: 6
+      uint8_t minute[dataLimit];  //: 6
+      uint8_t second[dataLimit];  //: 6
+      uint8_t pressure_int[dataLimit];  //: 8
+      uint8_t pressure_decimal[dataLimit]; //: 4
+      uint8_t recieved[dataLimit];  //: 2
+    };
+    dataArray db;
 
-void pressureToString(char* result, int index) {
-  char pCh[4];              // Allocate enough space to hold largest possible
-  itoa(data.pressure_int[index], pCh, 10);
-  //dtostrf(pr, 3, 1, pCh);
-  strcat(result, pCh);
-  itoa(data.pressure_decimal[index], pCh, 10);
-  strcat(result, pCh);
-}
+    int count = 0;                  // Tracks the number of data packets recorded
 
-void getDataString(int index) {
-  clear(dataString, dataLength);
-  strcat(dataString, "DATA-");
-  char dCt[3];
-  itoa(index, dCt, 10);
-  strcat(dataString, dCt);
-  strcat(dataString, ":");
-  strcat(dataString, "RA01;UTC=");
-  timeToString(dataString, data.hour[index], data.minute[index], data.second[index]);
-  // Add pressure to string
-  strcat(dataString, ";kpa=");
-  char pressureTmp[6];
-  pressureToString(pressureTmp, index);
-  strcat(dataString, pressureTmp);
-}
+    // Format data from a specified index in array as a string to be sent over radio
+    void getDataString(int index) {
+      clear(dataString, dataLength);
+      strcat(dataString, "DATA-");
+      char dCt[3];
+      itoa(index, dCt, 10);
+      strcat(dataString, dCt);
+      strcat(dataString, ":");
+      strcat(dataString, "RA01;UTC=");
+      timeToString(dataString, db.hour[index], db.minute[index], db.second[index]);
+      // Add pressure to string
+      strcat(dataString, ";kpa=");
+      char pressureTmp[6];
+      pressureToString(pressureTmp, index);
+      strcat(dataString, pressureTmp);
+    }
 
-void getSampleData(){
-  dataCount = 1;
-  for(int i = 0; i < 3; i++){
-    data.hour[i] = 88;
-    data.minute[i] = 88;
-    data.second[i] = 88;
-    data.pressure_int[i] = sampleDataCounter + 1;
-  }
-  sampleDataCounter++;
-}
+    // Convert time data from array to string
+    void timeToString(char *result, int hr, int mn, int sc) {
+      // Add hour to string
+      if (hr < 10) {
+        strcat(result, "0");
+      }
+      char tmp[7];
+      itoa(hr, tmp, 10);
+      strcat(result, tmp);
+      strcat(result, ":");
+      // Add minute to string
+      if (mn < 10) {
+        strcat(result, "0");
+      }
+      itoa(mn, tmp, 10);
+      strcat(result, tmp);
+      strcat(result, ":");
+      // Add second to string
+      if (sc < 10) {
+        strcat(result, "0");
+      }
+      itoa(sc, tmp, 10);
+      strcat(result, tmp);
+    }
 
-void broadcastCompanyData() {
-  radio.dataAdd(companyData);
-  radio.dataAdd("; ");
+    // Convert pressure data from array to string
+    void pressureToString(char* result, int index) {
+      char pCh[4];              // Allocate enough space to hold largest possible
+      itoa(db.pressure_int[index], pCh, 10);
+      //dtostrf(pr, 3, 1, pCh);
+      strcat(result, pCh);
+      itoa(db.pressure_decimal[index], pCh, 10);
+      strcat(result, pCh);
+    }
 
-  if (RTC.isRunning()) {
-    char time[10] = "";
-    timeToString(time, RTC.getHours(), RTC.getMinutes(), RTC.getSeconds());
-    radio.dataAdd(time);
-  } else {
-    radio.dataAdd("TimeError");
-  }
-  radio.dataAdd(" UTC; ");
+};
 
- float pressure = readPressure();
-    char pCh[4];              // Allocate enough space to hold largest possible
-    itoa(int(pressure), pCh, 10);
-    radio.dataAdd(pCh);
-    radio.dataAdd(".");
-    itoa(static_cast<int>((pressure - static_cast<int>(pressure)) * 10), pCh, 10);
-    radio.dataAdd(pCh);
-  radio.dataAdd(" kpa; ");
-
-  float depth = float(pressure/kpa_to_m);
-  char dCh[4];
-  itoa(int(depth), dCh, 10);
-  radio.dataAdd(dCh);
-  radio.dataAdd(".");
-  itoa(static_cast<int>((depth - static_cast<int>(depth)) * 10), dCh, 10);
-  radio.dataAdd(dCh);
-  radio.dataAdd(" meters");
-
-  radio.dataSend();
-  radio.waitSent();
-}
-
-void Float::resetSampleData(){
-  sampleDataCounter = 0;
-}
-
-void Float::recordData(){
-  if(RTC.isRunning()){
-    data.hour[dataCount] = static_cast<uint8_t>(RTC.getHours());
-    data.minute[dataCount] = static_cast<uint8_t>(RTC.getMinutes());
-    data.second[dataCount] = static_cast<uint8_t>(RTC.getSeconds());
-  } else {
-    data.hour[dataCount] = static_cast<uint8_t>(42);
-    data.minute[dataCount] = static_cast<uint8_t>(42);
-    data.second[dataCount] = static_cast<uint8_t>(42);
-  }
-
-  float pressure = readPressure();
-
-  data.pressure_int[dataCount] = static_cast<uint8_t>(int(pressure));
-  data.pressure_decimal[dataCount] = static_cast<uint8_t>((pressure - static_cast<int>(pressure)) * 10);
-  data.recieved[dataCount] = static_cast<uint8_t>(0);
-  dataCount++;
-}
-
-void Float::sendData(char* values){
-
-}
-
-##endif
+#endif

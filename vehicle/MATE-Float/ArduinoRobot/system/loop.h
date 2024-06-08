@@ -1,15 +1,14 @@
 #ifndef LOOP_h
 #define LOOP_h
 
-#include "include.h"
-
-class System {
+class Loop {
     public:
         byte motion = 1;
         int timeUnder = 0;
 
         void run() {
           // adjustSpeed();
+
   checkLimits();
 
 
@@ -102,14 +101,6 @@ class System {
 
         unsigned long fiveSecondCounter = 0;
 
-        void initiatePins() {
-          pinMode(limitEmptyPin, INPUT_PULLUP);
-          pinMode(limitFullPin, INPUT_PULLUP);
-          pinMode(controlEmptyPin, INPUT_PULLUP);
-          pinMode(controlFillPin, INPUT_PULLUP);
-          pinMode(controlStopPin, INPUT_PULLUP);
-          servo.attach(servoPin);
-        }
 
         class Flag {
             public:
@@ -144,6 +135,39 @@ class System {
         }
 
 };
-System system;
+
+readCommand(){
+  if(radio.available() > 0){
+    //First, read the incomming data (automatically calls serialWait())
+    radio.readData(dataIn, 64);
+    // Debug, sends length of recieved data
+      //char tmp[3];
+      //itoa(strlen(dataIn), tmp, 10);
+      //radio.send(tmp);
+      //radio.waitSent();
+
+    //Decode the message and execute the command
+    for(int i = 0; i < c.commandLen; i++){  // For number of potential commands
+      if(strncmp(dataIn, c.command[i].code, strlen(dataIn)) == 0){  // If strings match
+        activeCommand = c.command[i].index;   // Set active command to current index
+        flag.broadcast = false; // Stop broadcasting
+        flag.manualControl = false; // Disable manual control
+      // char tmp[3];
+      // itoa(activeCommand, tmp, 10);
+      // radio.send(tmp);
+      // radio.waitSent();
+        //Send a confirmation message that the data was recieved and wait for it to send
+        radio.dataAdd("Executing ");
+        radio.dataAdd(dataIn);
+        radio.dataSend();
+        radio.waitSent();
+        return true;
+      }
+    }
+    radio.send("Command not Recognized");
+    radio.waitSent();
+  }
+  return false;
+}
 
 #endif

@@ -1,0 +1,18 @@
+status,number,error,reason,resolution
+r,001,When data passed to reyax.send() too long: data length mismatch error returned,array not truncated,truncate array by adding null character
+p,002,Radio not connected error message truncated,unknown,pending
+r,003,Unable to resign pins after declaring oject,new pointer is assigned instead of modifying existing one,delete existing pointer using delete radioSerial;
+f,004,Unable to redefine pins after initiating object,need to close serial port before modifying parameters,add provision to close port before changing based on isListening()
+r,004,Unable to redefine pins after initiating object,need to close serial port before modifying parameters,add provision to close port before changing based on bool defined in the begin function. Also saves original baud rate to reopen port, or takes optional parameter to define new paud rate. 
+f,005,No error message associated for <No Response>,no error defined,create error message to retrun from function
+f,005,Error message not retruned from <No Response>,error message definition never reached because it is called after exiting loop,move error definition statement ot before loop is exited
+r,006,Recently added error messages are not returned,array size not updated to reflect change,update array size in error message loop
+r,007,waitRecieved does not return true when response message is sent,issue with readData function,troubleshoot readData function
+r,008,readData does not work,issue with readLine function,troubleshoot readdLine function 
+r,002,Radio not connected error message truncated,unknown,shortened message
+r,009,readLine does not work,header issue on sending side,fix header
+r,010,truncation of data read through readData() failed,indexing error,adjusted index
+f,011,waitRecieved() function fails when response is trahsmitted,appears to be residual data issue,problem with main read function
+p,012,readData function returns data in chunks,not waiting for incoming transmission to complete before reading all the data,add a section to wait for incomming data to finish being sent
+
+

@@ -1,8 +1,6 @@
 #ifndef CONTROL_h
 #define CONTROL_h
 
-byte testAbilityToAcess = 1; 
-
 Motor motor(pin.servo);                     // Create motor object on servo pin
 Limit limit(pin.limitEmpty, pin.limitFull);    // Create limit object on limit pins
 Button fillButton(pin.controlFill);
@@ -11,7 +9,7 @@ Button stopButton(pin.controlStop);
 
 class Control {
   public:
-    //Control(){}
+    Control(){}
     bool isEmpty(){
       return limit.isEmpty();
     }

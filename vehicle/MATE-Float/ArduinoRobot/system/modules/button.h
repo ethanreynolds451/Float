@@ -5,9 +5,10 @@ class Button{
     public:
         Button(byte p){
             buttonPin = p;
+            pinMode(p, INPUT_PULLUP);
         }
         bool pressed(){
-            return digitalRead(buttonPin);
+            return ! digitalRead(buttonPin);
         }
     private:
       byte buttonPin;

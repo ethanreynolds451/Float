@@ -2,6 +2,14 @@
 #define INITIATE_h
 
 #include "include.h"
+#include "loop.h"
+
+REYAX radio;                      // Create REYAX object
+PCF8523 RTC;                      // Create instance of RTC
+Servo servo;                      // Create instance of Servo
+
+Control control;
+Loop loop;
 
 class Float {
   public:
@@ -9,10 +17,14 @@ class Float {
       radio.setPins(TX, RX);
     }
     void begin(int baud = defaultBaudrate){
-      system.initiatePins();
+      initiatePins();
+      initiateObjects();
+      loop.run();
+    }
+  private:
+    void initiateObjects(){
       radio.begin(baud);
       RTC.begin();
-      system.run();
     }
 };
 
